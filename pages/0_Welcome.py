@@ -33,7 +33,7 @@ st.markdown(f"""
         letter-spacing: 0.2em;
         text-transform: uppercase;
         margin-bottom: 0.75rem;
-    ">Custom Platform</div>
+    ">Content Management Platform</div>
     <div style="
         font-family: 'Playfair Display', Georgia, serif;
         color: #FFFFFF;
@@ -49,9 +49,9 @@ st.markdown(f"""
         line-height: 1.6;
         max-width: 640px;
     ">
-        A unified content management system built exclusively for
-        Starr Restaurant Group. Manage website content, images, menus,
-        and brand assets across your entire portfolio from one place.
+        Your central platform for managing website content, images, menus,
+        and brand assets across the entire Starr Restaurant Group portfolio
+        — all from one place.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -130,41 +130,41 @@ with f1:
     st.markdown(_feature_card.format(
         icon="&#128444;",
         title="Image Pipeline",
-        desc="Upload once, auto-resize to every format your websites need. "
-             "AI-generated alt text for accessibility compliance. "
+        desc="Upload once, automatically resize to every format your websites need. "
+             "Alt text generated for accessibility compliance. "
              "Brand-aware processing — automatic B&W conversion for Chef's Table."
     ), unsafe_allow_html=True)
 
 with f2:
     st.markdown(_feature_card.format(
         icon="&#128221;",
-        title="AI Website Copy",
-        desc="Generate on-brand website copy and SEO meta tags powered by Claude. "
-             "Scrapes your live site for context, follows your brand voice guidelines, "
-             "and produces publish-ready content in seconds."
+        title="Website Copy",
+        desc="Generate on-brand website copy and SEO meta tags in seconds. "
+             "Pulls context from your live site, follows your brand voice guidelines, "
+             "and produces publish-ready content for every restaurant."
     ), unsafe_allow_html=True)
 
 with f3:
     st.markdown(_feature_card.format(
         icon="&#127860;",
         title="Menu Management",
-        desc="Parse Word document menus into structured, CMS-ready HTML. "
+        desc="Convert Word document menus into structured, website-ready HTML. "
              "Handles multi-section layouts, dietary markers, and price formatting "
-             "across all 38 restaurants."
+             "across your entire portfolio."
     ), unsafe_allow_html=True)
 
 st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
 
-# --- How It Works ---
+# --- More features ---
 f4, f5 = st.columns(2)
 
 with f4:
     st.markdown(_feature_card.format(
         icon="&#127912;",
         title="Brand Detection",
-        desc="Automatically extracts primary colors, booking platforms, social links, "
+        desc="Automatically pulls primary colors, booking platforms, social links, "
              "contact details, and reservation IDs from your existing websites. "
-             "No manual data entry."
+             "No manual data entry required."
     ), unsafe_allow_html=True)
 
 with f5:
@@ -192,13 +192,12 @@ st.markdown("""
 ">
     <div>
         <div style="font-family: 'DM Sans', sans-serif; font-weight: 600; font-size: 0.95rem; color: #031E41; margin-bottom: 0.35rem;">
-            Custom-Built Software
+            Built for Starr Restaurant Group
         </div>
         <div style="font-family: 'DM Sans', sans-serif; font-size: 0.82rem; color: #6B7280; line-height: 1.6;">
-            This platform was designed and developed specifically for Starr Restaurant Group
+            This platform was designed and developed specifically for your team
             by <strong style="color: #031E41;">Made{<em>Tooled</em>}</strong> — purpose-built to fit your
-            workflows, your brand standards, and your scale. Not a generic SaaS.
-            Not a WordPress plugin. Your tool.
+            workflows, your brand standards, and your scale.
         </div>
     </div>
     <div style="
