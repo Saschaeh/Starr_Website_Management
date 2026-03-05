@@ -222,7 +222,7 @@ def update_restaurant(name, **fields):
     if not fields:
         return
     set_clause = ", ".join(f"{k} = ?" for k in fields)
-    values = list(fields.values()) + [name]
+    values = tuple(v if v is not None else "" for v in fields.values()) + (name,)
     conn = get_connection()
     conn.execute(f"UPDATE restaurants SET {set_clause} WHERE name = ?", values)
     _commit(conn)
