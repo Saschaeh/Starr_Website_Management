@@ -1206,6 +1206,8 @@ def _render_reservations_tab(slug, r_data, dname):
         ts = st.text_input("Tripleseat Form ID", value=r_data.get('tripleseat_form_id', ''),
                            key=f"bts_{slug}", placeholder="e.g. 6616",
                            help="Numeric lead_form_id from Tripleseat.")
+        if not r_data.get('tripleseat_form_id'):
+            st.caption(":gray[No group bookings / TripleSeat detected]")
     with col_ot_id:
         onetrust = st.text_input("OneTrust ID", value=r_data.get('onetrust_id', ''),
                                  key=f"bont_{slug}", placeholder="e.g. 01234567-abcd-...",
@@ -1243,6 +1245,23 @@ def _render_reservations_tab(slug, r_data, dname):
                 if not ok:
                     st.error(f"Could not scrape: {err}")
                 elif detected:
+                    # If no TripleSeat found, try group/events pages directly
+                    if not detected.get('tripleseat_form_id'):
+                        import requests as _req
+                        from src.cms.brand_detector import _detect_site_metadata
+                        _hdrs = {'User-Agent': 'Mozilla/5.0'}
+                        for _sub in ('/private-events/', '/group-dining/', '/private-dining/',
+                                     '/events/', '/parties/', '/private-events', '/group-dining'):
+                            try:
+                                _su = url.rstrip('/') + _sub
+                                _sr = _req.get(_su, headers=_hdrs, timeout=5)
+                                if _sr.ok and 'tripleseat' in _sr.text.lower():
+                                    _sm = _detect_site_metadata(_sr.content)
+                                    if _sm.get('tripleseat_form_id'):
+                                        detected['tripleseat_form_id'] = _sm['tripleseat_form_id']
+                                        break
+                            except Exception:
+                                pass
                     updates = {}
                     if detected.get('booking'):
                         updates['booking_platform'] = detected['booking']
@@ -1262,7 +1281,7 @@ def _render_reservations_tab(slug, r_data, dname):
                         st.success(f"Detected and saved: {', '.join(updates.keys())}")
                         st.rerun()
                     else:
-                        st.info("Nothing detected on the website.")
+                        st.info("No group booking page or TripleSeat form found. Restaurant likely doesn't offer group bookings.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
