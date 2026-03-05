@@ -90,11 +90,17 @@ def _show_list_view():
         # Contact: any contact info set
         contact_ok[s] = bool(r.get('phone') or r.get('address') or r.get('email_general'))
 
+    def _is_complete(s):
+        return (s in menu_slugs
+                and img_counts.get(s, 0) >= 9
+                and copy_counts.get(s, 0) >= 5
+                and brand_ok.get(s)
+                and ids_ok.get(s)
+                and links_ok.get(s)
+                and contact_ok.get(s))
+
     total = len(restaurants)
-    complete = sum(1 for r in restaurants
-                   if r['name'] in menu_slugs
-                   and img_counts.get(r['name'], 0) >= 9
-                   and copy_counts.get(r['name'], 0) >= 5)
+    complete = sum(1 for r in restaurants if _is_complete(r['name']))
 
     # --- Header row ---
     hc1, hc2 = st.columns([3, 1])
@@ -150,23 +156,18 @@ def _show_list_view():
     if city_filter != "All Cities":
         filtered = [r for r in filtered if (r.get('city') or get_city(r['name'])) == city_filter]
     if status_filter == "Complete":
-        filtered = [r for r in filtered
-                    if r['name'] in menu_slugs
-                    and img_counts.get(r['name'], 0) >= 9
-                    and copy_counts.get(r['name'], 0) >= 5]
+        filtered = [r for r in filtered if _is_complete(r['name'])]
     elif status_filter == "In Progress":
-        filtered = [r for r in filtered
-                    if (r['name'] in menu_slugs
-                        or img_counts.get(r['name'], 0) > 0
-                        or copy_counts.get(r['name'], 0) > 0)
-                    and not (r['name'] in menu_slugs
-                             and img_counts.get(r['name'], 0) >= 9
-                             and copy_counts.get(r['name'], 0) >= 5)]
+        filtered = [r for r in filtered if not _is_complete(r['name'])]
     elif status_filter == "Not Started":
         filtered = [r for r in filtered
                     if r['name'] not in menu_slugs
                     and img_counts.get(r['name'], 0) == 0
-                    and copy_counts.get(r['name'], 0) == 0]
+                    and copy_counts.get(r['name'], 0) == 0
+                    and not brand_ok.get(r['name'])
+                    and not ids_ok.get(r['name'])
+                    and not links_ok.get(r['name'])
+                    and not contact_ok.get(r['name'])]
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
