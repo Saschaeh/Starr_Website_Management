@@ -400,6 +400,7 @@ def _show_detail_view(slug):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_overview(slug, r_data, dname):
+    st.subheader("Overview")
     c1, c2 = st.columns(2)
     with c1:
         url = st.text_input("Website URL", value=r_data.get('website_url') or '',
@@ -441,6 +442,7 @@ def _render_overview(slug, r_data, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_menu_tab(slug, dname, menus_list):
+    st.subheader("Menu")
     from src.models import Restaurant as RestModel, ParsedMenu
     from src.menu.docx_parser import extract_text, filter_menu_content
     from src.menu.llm_client import parse_menu, parse_live_menu
@@ -758,6 +760,7 @@ REQUIRED_FIELDS = {f[0] for f in IMAGE_FIELDS if not f[5]}
 
 
 def _render_images_tab(slug, dname):
+    st.subheader("Images")
     from src.cms.image_processor import (
         resize_and_crop, fix_exif_orientation, make_image_filename,
         is_black_and_white, apply_black_overlay)
@@ -941,6 +944,7 @@ def _render_images_tab(slug, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_copy_tab(slug, r_data, dname):
+    st.subheader("Copy")
     from src.cms.copy_generator import (
         COPY_SECTIONS, generate_copy, load_master_instructions,
         save_master_instructions, DEFAULT_COPY_INSTRUCTIONS)
@@ -1194,6 +1198,7 @@ def _render_brand_tab(slug, r_data, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_reservations_tab(slug, r_data, dname):
+    st.subheader("IDs & Integrations")
     booking_val = r_data.get('booking_platform', '')
     if booking_val:
         st.caption(f"Detected platform: **{booking_val}**")
@@ -1343,6 +1348,7 @@ def _render_links_tab(slug, r_data, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_contact_tab(slug, r_data, dname):
+    st.subheader("Contact & Location")
     c1, c2 = st.columns(2)
     with c1:
         ph_val = st.text_input("Phone", value=r_data.get('phone', ''), key=f"bph_{slug}")
