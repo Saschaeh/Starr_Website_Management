@@ -62,6 +62,6 @@ if st.session_state.get('_sidebar_restaurants'):
             dname = r.get('display_name') or display_name(name)
             if st.button(dname, key=f"sidebar_{name}"):
                 st.session_state['selected_restaurant'] = name
-                st.rerun()
+                st.switch_page("pages/3_Restaurants.py")
 
 pg.run()
