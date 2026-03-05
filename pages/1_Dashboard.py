@@ -402,7 +402,6 @@ def _show_detail_view(slug):
     with hc1:
         stg_url = _staging_url(slug)
         link_html = f' <a href="{stg_url}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>' if stg_url else ''
-'
         st.markdown(
             f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
             f'font-weight:600;margin:0;">{dname}{link_html}</h1>'
