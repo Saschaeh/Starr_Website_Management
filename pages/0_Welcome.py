@@ -1,12 +1,12 @@
 """Welcome — Landing page for Starr Content Hub."""
 
 import streamlit as st
-from src.db import get_all_restaurants, get_menus_for_restaurant, get_images_for_restaurant, get_copy_for_restaurant
+from src.db import get_all_restaurants, list_menus, get_images_for_restaurant, get_copy_for_restaurant
 
 # --- Gather live stats ---
 restaurants = get_all_restaurants()
 n_restaurants = len(restaurants)
-n_menus = sum(1 for r in restaurants if get_menus_for_restaurant(r['name']))
+n_menus = len(list_menus())
 n_images = sum(len(get_images_for_restaurant(r['name'])) for r in restaurants)
 n_copy = sum(1 for r in restaurants if get_copy_for_restaurant(r['name']))
 
