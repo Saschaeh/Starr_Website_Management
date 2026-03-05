@@ -127,6 +127,7 @@ def init_db():
             address TEXT DEFAULT '',
             google_maps_url TEXT DEFAULT '',
             onetrust_id TEXT DEFAULT '',
+            wordfence_api_key TEXT DEFAULT '',
             pull_data INTEGER DEFAULT 0,
             checklist TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -164,6 +165,7 @@ def init_db():
     # Migrations — add columns that may not exist in older databases
     _migrations = [
         ("restaurants", "onetrust_id", "TEXT DEFAULT ''"),
+        ("restaurants", "wordfence_api_key", "TEXT DEFAULT ''"),
         ("restaurants", "city", "TEXT DEFAULT ''"),
         ("restaurants", "accent_color", "TEXT DEFAULT ''"),
         ("restaurants", "accent_light", "TEXT DEFAULT ''"),

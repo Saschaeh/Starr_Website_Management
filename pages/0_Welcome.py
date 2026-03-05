@@ -12,6 +12,7 @@ n_copy = sum(1 for r in restaurants if get_copy_for_restaurant(r['name']))
 n_booking = sum(1 for r in restaurants if r.get('opentable_rid') or r.get('resy_url'))
 n_tripleseat = sum(1 for r in restaurants if r.get('tripleseat_form_id'))
 n_onetrust = sum(1 for r in restaurants if r.get('onetrust_id'))
+n_wordfence = sum(1 for r in restaurants if r.get('wordfence_api_key'))
 
 # Hide the top Starr header on the Welcome page to avoid double header
 st.markdown("""<style>.starr-header { display: none !important; }</style>""", unsafe_allow_html=True)
@@ -98,13 +99,15 @@ with c4:
 
 st.markdown("<div style='height: 0.75rem'></div>", unsafe_allow_html=True)
 
-c5, c6, c7, _sp = st.columns(4)
+c5, c6, c7, c8 = st.columns(4)
 with c5:
-    st.markdown(_stat_style.format(value=n_booking, label="Booking IDs"), unsafe_allow_html=True)
+    st.markdown(_stat_style.format(value=n_booking, label="Booking IDs (OpenTable / Resy)"), unsafe_allow_html=True)
 with c6:
     st.markdown(_stat_style.format(value=n_tripleseat, label="Tripleseat IDs"), unsafe_allow_html=True)
 with c7:
     st.markdown(_stat_style.format(value=n_onetrust, label="OneTrust IDs"), unsafe_allow_html=True)
+with c8:
+    st.markdown(_stat_style.format(value=n_wordfence, label="Wordfence API Keys"), unsafe_allow_html=True)
 
 st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
 
