@@ -433,13 +433,10 @@ def _render_overview(slug, r_data, dname):
 
     notes = st.text_area("Notes", value=r_data.get('notes') or '',
                          key=f"ov_notes_{slug}", height=80, placeholder="Internal notes...")
-    push_val = st.toggle("Push Data", value=bool(r_data.get('pull_data')),
-                         key=f"ov_push_{slug}")
-
     cs, cd = st.columns([3, 1])
     with cs:
         if st.button("Save Changes", key=f"ov_save_{slug}", type="primary"):
-            fields = {'website_url': url, 'notes': notes, 'pull_data': int(push_val)}
+            fields = {'website_url': url, 'notes': notes}
             if new_city:
                 fields['city'] = new_city
             db.update_restaurant(slug, **fields)
@@ -535,7 +532,7 @@ def _render_menu_tab(slug, dname, menus_list):
         return
 
     # Toolbar
-    c1, c2, c3, _, c4 = st.columns([1, 1, 1.5, 4.5, 1])
+    c1, c2, c3 = st.columns([1, 1, 1.5])
     with c1:
         if st.button("Edit", key=f"me_{slug}", width="stretch"):
             st.session_state[f"editing_{slug}"] = True
@@ -556,10 +553,6 @@ def _render_menu_tab(slug, dname, menus_list):
         if st.button("Review", key=f"mr_{slug}", width="stretch"):
             st.session_state[rk] = not st.session_state.get(rk, False)
             st.rerun()
-    with c4:
-        st.toggle("Push", value=bool((db.get_restaurant(slug) or {}).get('pull_data')),
-                  key=f"mp_{slug}")
-
     # Review
     rk = f"rev_{slug}"
     if st.session_state.get(rk):

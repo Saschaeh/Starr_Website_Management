@@ -39,6 +39,10 @@ inject_css()
 # --- Header ---
 render_header()
 
+# --- Sidebar title ---
+with st.sidebar:
+    st.markdown('<div class="sidebar-title">Management Tools</div>', unsafe_allow_html=True)
+
 # --- Navigation ---
 dashboard = st.Page("pages/1_Dashboard.py", title="Restaurants", icon=":material/restaurant:", default=True)
 batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")

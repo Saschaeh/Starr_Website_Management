@@ -156,6 +156,42 @@ def inject_css():
     [data-testid="stSidebar"] .stRadio label {
         color: #FFFFFF !important;
     }
+    /* Sidebar nav links — high contrast */
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
+        padding-top: 0.5rem;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
+        color: #FFFFFF !important;
+        opacity: 1 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a span {
+        color: #FFFFFF !important;
+        font-weight: 500 !important;
+        font-size: 0.9rem !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover span {
+        color: #C5A258 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-selected="true"] span {
+        color: #C5A258 !important;
+        font-weight: 600 !important;
+    }
+    /* Sidebar nav icons */
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a svg,
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a [data-testid="stIconMaterial"] {
+        color: #C5A258 !important;
+        fill: #C5A258 !important;
+    }
+    /* Sidebar title */
+    .sidebar-title {
+        font-family: 'DM Sans', sans-serif;
+        color: #C5A258;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        padding: 1.5rem 1rem 0.5rem 1rem;
+    }
 
     /* === PROGRESS PILLS === */
     .progress-pill {
