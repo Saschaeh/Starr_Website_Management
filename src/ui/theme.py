@@ -201,7 +201,12 @@ def inject_css():
         font-weight: 600;
         letter-spacing: 0.15em;
         text-transform: uppercase;
-        padding: 1.5rem 1rem 0.5rem 1rem;
+        padding: 0.75rem 1rem 0.25rem 1rem;
+        margin: 0;
+    }
+    .sidebar-title-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     /* === PROGRESS PILLS === */
