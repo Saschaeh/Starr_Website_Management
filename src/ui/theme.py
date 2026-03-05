@@ -149,39 +149,51 @@ def inject_css():
     }
 
     /* === NAVIGATION SIDEBAR === */
-    [data-testid="stSidebar"] {
+    [data-testid="stSidebar"],
+    section[data-testid="stSidebar"] {
         background-color: #031E41 !important;
     }
-    [data-testid="stSidebar"] [data-testid="stMarkdown"] {
+    [data-testid="stSidebar"] [data-testid="stMarkdown"],
+    [data-testid="stSidebar"] p,
+    [data-testid="stSidebar"] span:not([data-testid]) {
         color: #FFFFFF;
     }
     [data-testid="stSidebar"] .stRadio label {
         color: #FFFFFF !important;
     }
-    /* Sidebar nav links â€” high contrast */
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
+    /* Sidebar nav links — covers old stSidebarNav + new nav element */
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"],
+    [data-testid="stSidebar"] nav {
         padding-top: 0 !important;
         margin-top: 0 !important;
     }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a,
+    [data-testid="stSidebar"] nav a,
+    [data-testid="stSidebar"] nav ul li a {
         color: #FFFFFF !important;
         opacity: 1 !important;
     }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a span {
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a span,
+    [data-testid="stSidebar"] nav a span,
+    [data-testid="stSidebar"] nav ul li a span {
         color: #FFFFFF !important;
         font-weight: 500 !important;
         font-size: 0.9rem !important;
     }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover span {
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a:hover span,
+    [data-testid="stSidebar"] nav a:hover span {
         color: #C5A258 !important;
     }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-selected="true"] span {
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a[aria-selected="true"] span,
+    [data-testid="stSidebar"] nav a[aria-selected="true"] span {
         color: #C5A258 !important;
         font-weight: 600 !important;
     }
     /* Sidebar nav icons */
     [data-testid="stSidebar"] [data-testid="stSidebarNav"] a svg,
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a [data-testid="stIconMaterial"] {
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] a [data-testid="stIconMaterial"],
+    [data-testid="stSidebar"] nav a svg,
+    [data-testid="stSidebar"] nav a [data-testid="stIconMaterial"] {
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
@@ -205,7 +217,8 @@ def inject_css():
     }
 
     /* Sidebar title via ::before on nav */
-    [data-testid="stSidebarNav"]::before {
+    [data-testid="stSidebarNav"]::before,
+    [data-testid="stSidebar"] nav::before {
         content: "MANAGEMENT TOOLS";
         display: block;
         font-family: 'DM Sans', sans-serif;
@@ -548,9 +561,5 @@ def inject_css():
         background: transparent !important;
     }
 
-    /* Widen the main content area */
-    .block-container {
-        max-width: 100% !important;
-    }
     </style>
     """, unsafe_allow_html=True)
