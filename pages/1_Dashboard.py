@@ -1350,6 +1350,7 @@ def _render_reservations_tab(slug, r_data, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_links_tab(slug, r_data, dname):
+    st.subheader("Links")
     l1, l2 = st.columns(2)
     with l1:
         ml = st.text_input("Mailing List URL", value=r_data.get('mailing_list_url', ''),
