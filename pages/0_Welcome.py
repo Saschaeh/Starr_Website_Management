@@ -1,6 +1,7 @@
 """Welcome — Landing page for Starr Content Hub."""
 
 import streamlit as st
+st.session_state.pop('_on_restaurants_page', None)
 from src.db import get_all_restaurants, list_menus, get_images_for_restaurant, get_copy_for_restaurant
 
 # --- Gather live stats ---

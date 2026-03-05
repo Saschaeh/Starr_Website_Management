@@ -3,8 +3,15 @@
 import importlib
 import streamlit as st
 
-# Always expand the sidebar restaurant list on this page
+# Toggle: if already on this page with list expanded, collapse and go to Progress
+if st.session_state.get('_on_restaurants_page'):
+    st.session_state['_sidebar_restaurants'] = False
+    st.session_state['_on_restaurants_page'] = False
+    st.switch_page("pages/1_Dashboard.py")
+
+# Mark that we're on this page and expand the list
 st.session_state['_sidebar_restaurants'] = True
+st.session_state['_on_restaurants_page'] = True
 
 # If a restaurant is selected, show its detail view
 _selected = st.session_state.get('selected_restaurant')

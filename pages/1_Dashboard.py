@@ -8,6 +8,7 @@ import zipfile
 from datetime import datetime
 
 import streamlit as st
+st.session_state.pop('_on_restaurants_page', None)
 import streamlit.components.v1 as components
 from PIL import Image
 

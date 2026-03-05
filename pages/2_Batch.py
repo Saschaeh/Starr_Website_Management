@@ -1,6 +1,7 @@
 """Batch Operations — Bulk menu upload, image upload, alt text, copy generation, brand detection."""
 
 import streamlit as st
+st.session_state.pop('_on_restaurants_page', None)
 
 from src import db
 from src.restaurant_registry import display_name

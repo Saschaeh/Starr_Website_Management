@@ -41,7 +41,7 @@ render_header()
 
 # --- Navigation ---
 welcome = st.Page("pages/0_Welcome.py", title="Welcome", icon=":material/home:", default=True)
-dashboard = st.Page("pages/1_Dashboard.py", title="Progress", icon=":material/bar_chart:")
+dashboard = st.Page("pages/1_Dashboard.py", title="Dashboard", icon=":material/bar_chart:")
 batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
 # Arrow toggles based on whether restaurant list is expanded
