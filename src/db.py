@@ -21,19 +21,15 @@ load_dotenv()
 # Connection setup — detect Turso vs local
 # ---------------------------------------------------------------------------
 
-TURSO_DB_URL = os.getenv('TURSO_DB_URL', '')
-TURSO_AUTH_TOKEN = os.getenv('TURSO_AUTH_TOKEN', '')
-USE_TURSO = bool(TURSO_DB_URL)
-
-if USE_TURSO:
-    import libsql_experimental as libsql
-else:
-    import sqlite3
-
 DB_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', 'data')
 DB_PATH = os.path.join(DB_DIR, 'starr_content_hub.db')
 
 _local = threading.local()
+
+
+def _use_turso():
+    """Check at call time (not import time) so Streamlit secrets are loaded."""
+    return bool(os.getenv('TURSO_DB_URL', ''))
 
 
 def _rows_to_dicts(cursor):
@@ -55,9 +51,21 @@ def get_connection():
     conn = getattr(_local, 'conn', None)
     if conn is not None:
         return conn
-    if USE_TURSO:
-        conn = libsql.connect(TURSO_DB_URL, auth_token=TURSO_AUTH_TOKEN)
+    if _use_turso():
+        try:
+            import libsql_experimental as libsql
+            conn = libsql.connect(
+                os.getenv('TURSO_DB_URL'),
+                auth_token=os.getenv('TURSO_AUTH_TOKEN', ''))
+        except ImportError:
+            # libsql not installed (e.g. Windows dev) — fall back to local
+            import sqlite3
+            os.makedirs(DB_DIR, exist_ok=True)
+            conn = sqlite3.connect(DB_PATH, check_same_thread=False)
+            conn.execute("PRAGMA journal_mode=WAL")
+            conn.execute("PRAGMA foreign_keys=ON")
     else:
+        import sqlite3
         os.makedirs(DB_DIR, exist_ok=True)
         conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         conn.execute("PRAGMA journal_mode=WAL")
@@ -73,7 +81,7 @@ def _commit(conn):
     """Commit and, for Turso connections, sync."""
     global _last_sync_status
     conn.commit()
-    if USE_TURSO:
+    if _use_turso():
         if hasattr(conn, 'sync'):
             try:
                 conn.sync()
