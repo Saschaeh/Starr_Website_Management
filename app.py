@@ -45,25 +45,17 @@ batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
 pg = st.navigation([dashboard, batch])
 
-# --- Sidebar restaurant quick-nav ---
+# --- Sidebar: Restaurants expandable section ---
 from src.db import get_all_restaurants
 from src.restaurant_registry import display_name
 
 with st.sidebar:
-    st.markdown(
-        '<div class="sidebar-section-label">'
-        'Restaurants <span class="sidebar-plus">+</span></div>',
-        unsafe_allow_html=True)
-    show_restaurants = st.session_state.get('_sidebar_restaurants', False)
-    if not show_restaurants:
-        # Invisible toggle button styled as the section label click area
-        if st.button("Show all", key="sidebar_toggle_restaurants"):
-            st.session_state['_sidebar_restaurants'] = True
-            st.rerun()
-    else:
-        if st.button("Hide", key="sidebar_toggle_restaurants"):
-            st.session_state['_sidebar_restaurants'] = False
-            st.rerun()
+    expanded = st.session_state.get('_sidebar_restaurants', False)
+    arrow = "expand_less" if expanded else "expand_more"
+    if st.button(f":material/restaurant:  Restaurants", key="sidebar_restaurants_toggle"):
+        st.session_state['_sidebar_restaurants'] = not expanded
+        st.rerun()
+    if expanded:
         for r in get_all_restaurants():
             name = r['name']
             dname = r.get('display_name') or display_name(name)

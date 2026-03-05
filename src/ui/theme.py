@@ -183,44 +183,32 @@ def inject_css():
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
-    /* Sidebar restaurant section label */
-    .sidebar-section-label {
-        font-family: 'DM Sans', sans-serif;
-        color: #FFFFFF;
-        font-size: 0.9rem;
-        font-weight: 500;
-        padding: 0.75rem 0.75rem 0.25rem 0.75rem;
-    }
-    .sidebar-plus {
-        color: #C5A258;
-        font-weight: 700;
-        font-size: 1rem;
-        margin-left: 0.25rem;
-    }
-    /* Sidebar toggle button */
-    [data-testid="stSidebar"] [class*="st-key-sidebar_toggle"] button {
+    /* Sidebar "Restaurants" toggle — match native nav links */
+    [data-testid="stSidebar"] [class*="st-key-sidebar_restaurants_toggle"] button {
         background: none !important;
         border: none !important;
-        color: #C5A258 !important;
-        font-size: 0.75rem !important;
+        color: #FFFFFF !important;
+        font-size: 0.9rem !important;
         font-weight: 500 !important;
-        padding: 0 0.75rem !important;
+        padding: 0.4rem 0.75rem !important;
         min-height: 0 !important;
         text-align: left !important;
         justify-content: flex-start !important;
+        width: 100% !important;
+        border-radius: 0.5rem !important;
     }
-    [data-testid="stSidebar"] [class*="st-key-sidebar_toggle"] button:hover {
-        color: #FFFFFF !important;
-        background: none !important;
+    [data-testid="stSidebar"] [class*="st-key-sidebar_restaurants_toggle"] button:hover {
+        color: #C5A258 !important;
+        background: rgba(255,255,255,0.05) !important;
     }
-    /* Sidebar restaurant link buttons */
+    /* Sidebar restaurant sub-items — indented */
     [data-testid="stSidebar"] [class*="st-key-sidebar_"] button {
         background: none !important;
         border: none !important;
-        color: rgba(255,255,255,0.7) !important;
+        color: rgba(255,255,255,0.65) !important;
         font-size: 0.8rem !important;
         font-weight: 400 !important;
-        padding: 0.15rem 0.75rem !important;
+        padding: 0.2rem 0.75rem 0.2rem 2.5rem !important;
         min-height: 0 !important;
         text-align: left !important;
         justify-content: flex-start !important;
