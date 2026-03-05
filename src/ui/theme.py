@@ -183,34 +183,16 @@ def inject_css():
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
-    /* Reorder sidebar: title above nav links */
-    [data-testid="stSidebar"] > div:first-child {
+    /* Reorder sidebar: title first, then nav */
+    [data-testid="stSidebar"] > div > div:first-child {
         display: flex !important;
         flex-direction: column !important;
-        padding-top: 0.5rem !important;
-        gap: 0 !important;
     }
     [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
         order: 2 !important;
-        padding: 0 !important;
-        margin: 0 !important;
     }
-    [data-testid="stSidebar"] .sidebar-title-wrapper {
+    [data-testid="stSidebar"] [data-testid="stSidebarContent"] > div:has(.sidebar-title) {
         order: 1 !important;
-    }
-    /* Kill ALL internal spacing in sidebar */
-    [data-testid="stSidebar"] > div:first-child > * {
-        margin: 0 !important;
-        padding-top: 0 !important;
-        padding-bottom: 0 !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] ul {
-        padding: 0 !important;
-        margin: 0 !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] > div {
-        padding: 0 !important;
-        margin: 0 !important;
     }
     /* Sidebar title */
     .sidebar-title {
@@ -220,7 +202,7 @@ def inject_css():
         font-weight: 600;
         letter-spacing: 0.15em;
         text-transform: uppercase;
-        padding: 0 1rem 0.25rem 1rem;
+        padding: 0 0 0.4rem 0;
         margin: 0;
     }
 
