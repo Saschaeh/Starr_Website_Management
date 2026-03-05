@@ -4,7 +4,7 @@ import streamlit as st
 st.session_state.pop('_on_restaurants_page', None)
 
 from src import db
-from src.restaurant_registry import display_name
+from src.restaurant_registry import display_name, city_from_address
 
 
 restaurants = db.get_all_restaurants()
@@ -134,6 +134,12 @@ if st.button("Detect Missing Brand Data", type="primary", key="batch_brand"):
                     fields[k] = val
             if detected.get('booking') and not r.get('booking_platform'):
                 fields['booking_platform'] = detected['booking']
+            # Auto-detect city from address
+            addr_val = detected.get('address', '') or fields.get('address', '')
+            if addr_val:
+                detected_city = city_from_address(addr_val)
+                if detected_city and not r.get('city'):
+                    fields['city'] = detected_city
             if fields:
                 db.update_restaurant(slug, **fields)
                 updated += 1

@@ -14,7 +14,7 @@ from PIL import Image
 
 from src import db
 from src.restaurant_registry import (
-    display_name, get_city, CITY_ORDER,
+    display_name, get_city, city_from_address, CITY_ORDER,
     detect_restaurant, ensure_restaurant, normalize_to_slug,
 )
 
@@ -81,9 +81,10 @@ def _show_list_view():
         # Brand: has logo or primary color
         has_logo = any(k in imgs and imgs[k].get('has_image') for k in ('Logo',))
         brand_ok[s] = bool(has_logo or r.get('primary_color'))
-        # IDs: any reservation/booking ID set
-        ids_ok[s] = bool(r.get('opentable_rid') or r.get('resy_url')
-                         or r.get('tripleseat_form_id') or r.get('onetrust_id'))
+        # IDs: must have booking platform ID (OT or Resy) AND tripleseat
+        has_booking = bool(r.get('opentable_rid') or r.get('resy_url'))
+        has_tripleseat = bool(r.get('tripleseat_form_id'))
+        ids_ok[s] = has_booking and has_tripleseat
         # Links: any link set
         links_ok[s] = bool(r.get('mailing_list_url') or r.get('order_online_url')
                            or r.get('facebook_url') or r.get('instagram_url'))
@@ -242,7 +243,7 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # IDs
             with cols[7]:
-                st.markdown(_check if ids_ok.get(slug) else _dash,
+                st.markdown(_check if ids_ok.get(slug) else _x_red,
                             unsafe_allow_html=True)
             # Links
             with cols[8]:
@@ -310,14 +311,8 @@ def _show_add_form():
     with c2:
         new_url = st.text_input("Website URL", placeholder="https://barclayprime.com",
                                 key="add_url")
-    c3, c4 = st.columns(2)
-    with c3:
-        new_city = st.selectbox("City", ["", "New York", "Philadelphia", "Florida",
-                                         "Nashville", "Washington D.C.", "Other"],
-                                key="add_city")
-    with c4:
-        detect_on_add = st.checkbox("Auto-detect brand data on add", value=True,
-                                    key="add_detect")
+    detect_on_add = st.checkbox("Auto-detect brand data on add", value=True,
+                                key="add_detect")
     a1, a2 = st.columns([1, 3])
     with a1:
         if st.button("Add Restaurant", type="primary", disabled=not (new_name or '').strip(),
@@ -327,8 +322,7 @@ def _show_add_form():
                 st.warning(f"'{new_name}' already exists.")
             else:
                 dn = display_name(new_name.strip())
-                ct = new_city or get_city(slug)
-                db.add_restaurant(slug, dn, city=ct, website_url=(new_url or '').strip())
+                db.add_restaurant(slug, dn, website_url=(new_url or '').strip())
                 if detect_on_add and (new_url or '').strip():
                     try:
                         from src.cms.brand_detector import scrape_website
@@ -344,10 +338,15 @@ def _show_add_form():
                                     'order_online_url') if det.get(k)}
                                 if det.get('booking'):
                                     flds['booking_platform'] = det['booking']
+                                if det.get('address'):
+                                    flds['address'] = det['address']
+                                    detected_city = city_from_address(det['address'])
+                                    if detected_city:
+                                        flds['city'] = detected_city
                                 if flds:
                                     db.update_restaurant(slug, **flds)
-                    except Exception:
-                        pass
+                    except Exception as e:
+                        st.warning(f"Auto-detect failed: {e}")
                 st.success(f"Added **{dn}**!")
                 st.session_state['selected_restaurant'] = slug
                 st.session_state.pop('show_add_form', None)
@@ -1234,13 +1233,49 @@ def _render_reservations_tab(slug, r_data, dname):
                              help="Google Tag Manager container ID.")
 
     st.markdown("---")
-    if st.button("Save IDs", type="primary", key=f"brs_save_{slug}"):
-        db.update_restaurant(slug, booking_platform=booking_val,
-                             opentable_rid=ot, resy_url=rs,
-                             tripleseat_form_id=ts, onetrust_id=onetrust,
-                             wordfence_api_key=wordfence, gtm_id=gtm)
-        st.success("Saved!")
-        st.rerun()
+    dc1, dc2, _ = st.columns([1, 1.2, 3])
+    with dc1:
+        if st.button("Save IDs", type="primary", key=f"brs_save_{slug}"):
+            db.update_restaurant(slug, booking_platform=booking_val,
+                                 opentable_rid=ot, resy_url=rs,
+                                 tripleseat_form_id=ts, onetrust_id=onetrust,
+                                 wordfence_api_key=wordfence, gtm_id=gtm)
+            st.success("Saved!")
+            st.rerun()
+    with dc2:
+        if st.button("Detect from Website", key=f"brs_detect_{slug}"):
+            url = r_data.get('website_url', '')
+            if not url:
+                st.warning("No website URL set. Add one in the Overview tab first.")
+            else:
+                from src.cms.brand_detector import scrape_website
+                with st.spinner(f"Scraping {url}..."):
+                    ok, text_content, err, detected = scrape_website(url)
+                if not ok:
+                    st.error(f"Could not scrape: {err}")
+                elif detected:
+                    updates = {}
+                    if detected.get('booking') and not r_data.get('booking_platform'):
+                        updates['booking_platform'] = detected['booking']
+                    if detected.get('opentable_rid') and not r_data.get('opentable_rid'):
+                        updates['opentable_rid'] = detected['opentable_rid']
+                    if detected.get('resy_url') and not r_data.get('resy_url'):
+                        updates['resy_url'] = detected['resy_url']
+                    if detected.get('tripleseat_form_id') and not r_data.get('tripleseat_form_id'):
+                        updates['tripleseat_form_id'] = detected['tripleseat_form_id']
+                    # Also auto-detect city from address
+                    if detected.get('address') and not r_data.get('address'):
+                        updates['address'] = detected['address']
+                    if detected.get('address'):
+                        detected_city = city_from_address(detected['address'])
+                        if detected_city and r_data.get('city', '') in ('', 'Other'):
+                            updates['city'] = detected_city
+                    if updates:
+                        db.update_restaurant(slug, **updates)
+                        st.success(f"Detected and saved: {', '.join(updates.keys())}")
+                        st.rerun()
+                    else:
+                        st.info("No new IDs detected (all fields already populated or not found on site).")
 
 
 # ═══════════════════════════════════════════════════════════════════════════

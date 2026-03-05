@@ -16,13 +16,13 @@ CITY_ORDER = ["New York", "Philadelphia", "Florida", "Nashville", "Washington D.
 
 RESTAURANT_CITIES = {
     # New York
-    "borromini-new": "New York",
+    "borromini-new": "Philadelphia",
     "buddakan-nyc": "New York",
     "el-vez-nyc": "New York",
     "electric-lemon": "New York",
     "lecafe-menu": "New York",
     "le-coucou": "New York",
-    "lmno": "New York",
+    "lmno": "Philadelphia",
     "pastis-nyc": "New York",
     "the-clocktower": "New York",
     "upland": "New York",
@@ -45,7 +45,7 @@ RESTAURANT_CITIES = {
     # Florida
     "el-vez-ft-lauderdale": "Florida",
     "makoto": "Florida",
-    "osteria-mozza": "Florida",
+    "osteria-mozza": "Washington D.C.",
     "pastis-wynwood": "Florida",
     "pastis-miami": "Florida",
     "steak-954": "Florida",
@@ -86,6 +86,26 @@ def display_name(name: str) -> str:
         else:
             parts.append(word.capitalize())
     return " ".join(parts)
+
+
+def city_from_address(address: str) -> str:
+    """Detect city group from a street address string."""
+    if not address:
+        return ''
+    addr = address.lower().replace(',', ' ')
+    # State/city patterns mapped to our city groups
+    if any(k in addr for k in ('new york', ', ny ', ' ny ')):
+        return 'New York'
+    if any(k in addr for k in ('philadelphia', ', pa ', ' pa ')):
+        return 'Philadelphia'
+    if any(k in addr for k in ('washington', ', dc ', ' dc ', 'd.c.')):
+        return 'Washington D.C.'
+    if any(k in addr for k in ('nashville', ', tn ', ' tn ')):
+        return 'Nashville'
+    if any(k in addr for k in ('miami', 'fort lauderdale', 'bal harbour',
+                                ', fl ', ' fl ')):
+        return 'Florida'
+    return ''
 
 
 def get_city(slug: str) -> str:
