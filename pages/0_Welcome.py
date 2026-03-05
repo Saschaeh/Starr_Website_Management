@@ -147,8 +147,8 @@ _feature_card = """
 with f1:
     st.markdown(_feature_card.format(
         icon="&#128444;",
-        title="Image Pipeline",
-        desc="Upload once, automatically resize to every format your websites need. "
+        title="Image Management",
+        desc="Upload and automatically resize for exact placements on the website. "
              "Consistent file naming conventions across all restaurants. "
              "Brand-aware processing — automatic B&W conversion for chef photos."
     ), unsafe_allow_html=True)
