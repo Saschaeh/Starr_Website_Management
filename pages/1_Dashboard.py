@@ -288,7 +288,7 @@ def _show_add_form():
     # Back button
     if st.button("< Back to Restaurants", key="add_back"):
         st.session_state.pop('show_add_form', None)
-        st.rerun()
+        st.switch_page("pages/1_Dashboard.py")
 
     st.markdown('<h1 style="font-family:\'Playfair Display\',serif;font-size:1.75rem;'
                 'font-weight:600;">Add New Restaurant</h1>', unsafe_allow_html=True)
@@ -368,7 +368,7 @@ def _show_detail_view(slug):
     # Back button
     if st.button("< Back to Restaurants", key="detail_back"):
         st.session_state.pop('selected_restaurant', None)
-        st.rerun()
+        st.switch_page("pages/1_Dashboard.py")
 
     # Restaurant header
     hc1, hc2 = st.columns([3, 1])
