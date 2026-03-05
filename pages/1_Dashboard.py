@@ -1020,7 +1020,7 @@ def _render_copy_tab(slug, r_data, dname):
                               'email_press', 'address', 'google_maps_url', 'order_online_url'):
                         dk = k if k != 'booking_platform' else 'booking'
                         val = detected.get(dk, '')
-                        if val and not r_data.get(k):
+                        if val:
                             fields[k] = val
                     if fields:
                         db.update_restaurant(slug, **fields)
@@ -1244,27 +1244,25 @@ def _render_reservations_tab(slug, r_data, dname):
                     st.error(f"Could not scrape: {err}")
                 elif detected:
                     updates = {}
-                    if detected.get('booking') and not r_data.get('booking_platform'):
+                    if detected.get('booking'):
                         updates['booking_platform'] = detected['booking']
-                    if detected.get('opentable_rid') and not r_data.get('opentable_rid'):
+                    if detected.get('opentable_rid'):
                         updates['opentable_rid'] = detected['opentable_rid']
-                    if detected.get('resy_url') and not r_data.get('resy_url'):
+                    if detected.get('resy_url'):
                         updates['resy_url'] = detected['resy_url']
-                    if detected.get('tripleseat_form_id') and not r_data.get('tripleseat_form_id'):
+                    if detected.get('tripleseat_form_id'):
                         updates['tripleseat_form_id'] = detected['tripleseat_form_id']
-                    # Also auto-detect city from address
-                    if detected.get('address') and not r_data.get('address'):
-                        updates['address'] = detected['address']
                     if detected.get('address'):
+                        updates['address'] = detected['address']
                         detected_city = city_from_address(detected['address'])
-                        if detected_city and r_data.get('city', '') in ('', 'Other'):
+                        if detected_city:
                             updates['city'] = detected_city
                     if updates:
                         db.update_restaurant(slug, **updates)
                         st.success(f"Detected and saved: {', '.join(updates.keys())}")
                         st.rerun()
                     else:
-                        st.info("No new IDs detected (all fields already populated or not found on site).")
+                        st.info("Nothing detected on the website.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1304,14 +1302,14 @@ def _render_links_tab(slug, r_data, dname):
                 elif detected:
                     updates = {}
                     for k in ('mailing_list_url', 'order_online_url', 'facebook_url', 'instagram_url'):
-                        if detected.get(k) and not r_data.get(k):
+                        if detected.get(k):
                             updates[k] = detected[k]
                     if updates:
                         db.update_restaurant(slug, **updates)
                         st.success(f"Detected: {', '.join(updates.keys())}")
                         st.rerun()
                     else:
-                        st.info("No new links detected.")
+                        st.info("Nothing detected on the website.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1354,18 +1352,18 @@ def _render_contact_tab(slug, r_data, dname):
                     updates = {}
                     for k in ('phone', 'address', 'google_maps_url',
                               'email_general', 'email_events', 'email_marketing', 'email_press'):
-                        if detected.get(k) and not r_data.get(k):
+                        if detected.get(k):
                             updates[k] = detected[k]
                     if detected.get('address'):
                         detected_city = city_from_address(detected['address'])
-                        if detected_city and r_data.get('city', '') in ('', 'Other'):
+                        if detected_city:
                             updates['city'] = detected_city
                     if updates:
                         db.update_restaurant(slug, **updates)
                         st.success(f"Detected: {', '.join(updates.keys())}")
                         st.rerun()
                     else:
-                        st.info("No new contact info detected.")
+                        st.info("Nothing detected on the website.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
