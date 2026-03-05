@@ -3,7 +3,7 @@
 import importlib
 import streamlit as st
 
-# Auto-expand sidebar restaurant list
+# Toggle sidebar restaurant list (clicking again collapses it)
 st.session_state['_sidebar_restaurants'] = True
 
 # Prevent double-execution: the import triggers the module body,

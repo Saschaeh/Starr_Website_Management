@@ -41,10 +41,14 @@ render_header()
 
 # --- Navigation ---
 dashboard = st.Page("pages/1_Dashboard.py", title="Progress", icon=":material/bar_chart:", default=True)
-restaurants = st.Page("pages/3_Restaurants.py", title="Restaurants", icon=":material/restaurant:")
 batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
-pg = st.navigation([dashboard, restaurants, batch])
+# Arrow toggles based on whether restaurant list is expanded
+_expanded = st.session_state.get('_sidebar_restaurants', False)
+_arrow_icon = ":material/expand_more:" if _expanded else ":material/chevron_right:"
+restaurants = st.Page("pages/3_Restaurants.py", title="Restaurants", icon=_arrow_icon)
+
+pg = st.navigation([dashboard, batch, restaurants])
 
 # --- Sidebar: Restaurant sub-list when expanded ---
 from src.db import get_all_restaurants
