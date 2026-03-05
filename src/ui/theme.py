@@ -37,7 +37,7 @@ def inject_css():
     footer {visibility: hidden;}
 
     .block-container {
-        padding-top: 2.5rem !important;
+        padding-top: 4rem !important;
         padding-bottom: 2rem !important;
         max-width: 1400px !important;
     }
@@ -192,7 +192,7 @@ def inject_css():
         font-size: 0.72rem;
         font-weight: 600;
         letter-spacing: 0.15em;
-        padding: 0.5rem 0.75rem 0.4rem 0.75rem;
+        padding: 0.5rem 0.75rem 0.4rem 0.4rem;
     }
 
     /* === PROGRESS PILLS === */
