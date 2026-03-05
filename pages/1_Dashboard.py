@@ -171,8 +171,8 @@ def _show_list_view():
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
-    _COL_W = [0.3, 2.0, 0.6, 0.7, 0.5, 0.6, 0.55, 0.5, 0.5, 0.6]
-    _COL_LABELS = ["", "Name", "Menu", "Images", "Chef", "Copy", "Brand", "IDs", "Links", "Contact"]
+    _COL_W = [0.3, 2.0, 0.6, 0.7, 0.5, 0.6, 0.55, 0.5, 0.5, 0.6, 0.5]
+    _COL_LABELS = ["", "Name", "Menu", "Images", "Chef", "Copy", "Brand", "IDs", "Links", "Contact", "Synced"]
     cols_h = st.columns(_COL_W)
     for col, label in zip(cols_h, _COL_LABELS):
         with col:
@@ -186,6 +186,7 @@ def _show_list_view():
     _dash = '<span style="color:#D1D5DB;">—</span>'
     _x_red = '<span style="color:#EF4444;font-weight:700;">&#10005;</span>'
     _x_orange = '<span style="color:#F59E0B;font-weight:700;">&#10005;</span>'
+    _sync_pending = '<span style="color:#94A3B8;font-size:0.85rem;" title="Not synced">&#9203;</span>'
 
     # --- Restaurant rows ---
     if not filtered:
@@ -249,6 +250,10 @@ def _show_list_view():
             # Contact
             with cols[9]:
                 st.markdown(_check if contact_ok.get(slug) else _x_orange,
+                            unsafe_allow_html=True)
+            # Synced
+            with cols[10]:
+                st.markdown(_check if r.get('pull_data') else _sync_pending,
                             unsafe_allow_html=True)
 
     # --- Handle Edit / Delete actions ---
