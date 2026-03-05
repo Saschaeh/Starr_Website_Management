@@ -1170,16 +1170,43 @@ def _render_brand_tab(slug, r_data, dname):
                     st.error(f"Could not scrape: {err}")
                 elif detected:
                     updates = {}
+                    saved_items = []
                     if detected.get('primary_color'):
                         updates['primary_color'] = detected['primary_color']
                     if detected.get('booking'):
                         updates['booking_platform'] = detected['booking']
+                    # Download and save logo
+                    if detected.get('logo_url'):
+                        try:
+                            import requests as _req
+                            _r = _req.get(detected['logo_url'], timeout=10,
+                                          headers={'User-Agent': 'Mozilla/5.0'})
+                            if _r.ok and len(_r.content) > 100:
+                                db.save_image(slug, 'Logo', _r.content,
+                                              detected['logo_url'].split('/')[-1].split('?')[0])
+                                saved_items.append('Logo')
+                        except Exception:
+                            pass
+                    # Download and save favicon
+                    if detected.get('favicon_url'):
+                        try:
+                            import requests as _req
+                            _r = _req.get(detected['favicon_url'], timeout=10,
+                                          headers={'User-Agent': 'Mozilla/5.0'})
+                            if _r.ok and len(_r.content) > 100:
+                                db.save_image(slug, 'Favicon', _r.content,
+                                              detected['favicon_url'].split('/')[-1].split('?')[0])
+                                saved_items.append('Favicon')
+                        except Exception:
+                            pass
                     if updates:
                         db.update_restaurant(slug, **updates)
-                        st.success(f"Detected: {', '.join(updates.keys())}")
+                        saved_items.extend(updates.keys())
+                    if saved_items:
+                        st.success(f"Detected: {', '.join(saved_items)}")
                         st.rerun()
                     else:
-                        st.info("No new brand data detected.")
+                        st.info("No brand data detected.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
