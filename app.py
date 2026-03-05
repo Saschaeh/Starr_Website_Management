@@ -40,7 +40,7 @@ inject_css()
 render_header()
 
 # --- Navigation ---
-dashboard = st.Page("pages/1_Dashboard.py", title="Restaurants", icon=":material/restaurant:", default=True)
+dashboard = st.Page("pages/1_Dashboard.py", title="Progress", icon=":material/bar_chart:", default=True)
 batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
 pg = st.navigation([dashboard, batch])
@@ -50,7 +50,20 @@ from src.db import get_all_restaurants
 from src.restaurant_registry import display_name
 
 with st.sidebar:
-    with st.expander("Restaurants", expanded=False, icon=":material/add:"):
+    st.markdown(
+        '<div class="sidebar-section-label">'
+        'Restaurants <span class="sidebar-plus">+</span></div>',
+        unsafe_allow_html=True)
+    show_restaurants = st.session_state.get('_sidebar_restaurants', False)
+    if not show_restaurants:
+        # Invisible toggle button styled as the section label click area
+        if st.button("Show all", key="sidebar_toggle_restaurants"):
+            st.session_state['_sidebar_restaurants'] = True
+            st.rerun()
+    else:
+        if st.button("Hide", key="sidebar_toggle_restaurants"):
+            st.session_state['_sidebar_restaurants'] = False
+            st.rerun()
         for r in get_all_restaurants():
             name = r['name']
             dname = r.get('display_name') or display_name(name)
