@@ -128,6 +128,7 @@ def init_db():
             google_maps_url TEXT DEFAULT '',
             onetrust_id TEXT DEFAULT '',
             wordfence_api_key TEXT DEFAULT '',
+            gtm_id TEXT DEFAULT '',
             pull_data INTEGER DEFAULT 0,
             checklist TEXT DEFAULT '',
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -166,6 +167,7 @@ def init_db():
     _migrations = [
         ("restaurants", "onetrust_id", "TEXT DEFAULT ''"),
         ("restaurants", "wordfence_api_key", "TEXT DEFAULT ''"),
+        ("restaurants", "gtm_id", "TEXT DEFAULT ''"),
         ("restaurants", "city", "TEXT DEFAULT ''"),
         ("restaurants", "accent_color", "TEXT DEFAULT ''"),
         ("restaurants", "accent_light", "TEXT DEFAULT ''"),

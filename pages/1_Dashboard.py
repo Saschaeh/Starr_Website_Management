@@ -186,6 +186,7 @@ def _show_list_view():
     _dash = '<span style="color:#D1D5DB;">—</span>'
     _x_red = '<span style="color:#EF4444;font-weight:700;">&#10005;</span>'
     _x_orange = '<span style="color:#F59E0B;font-weight:700;">&#10005;</span>'
+    _sync_live = '<span style="color:#22C55E;font-size:0.85rem;" title="Live">&#128077;</span>'
     _sync_pending = '<span style="color:#94A3B8;font-size:0.85rem;" title="Not synced">&#9203;</span>'
 
     # --- Restaurant rows ---
@@ -253,7 +254,7 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # Synced
             with cols[10]:
-                st.markdown(_check if r.get('pull_data') else _sync_pending,
+                st.markdown(_sync_live if r.get('pull_data') else _sync_pending,
                             unsafe_allow_html=True)
 
     # --- Handle Edit / Delete actions ---
@@ -1222,18 +1223,22 @@ def _render_reservations_tab(slug, r_data, dname):
                                  key=f"bont_{slug}", placeholder="e.g. 01234567-abcd-...",
                                  help="OneTrust cookie consent domain script ID.")
 
-    col_wf, _wf_sp = st.columns(2)
+    col_wf, col_gtm = st.columns(2)
     with col_wf:
         wordfence = st.text_input("Wordfence API Key", value=r_data.get('wordfence_api_key', ''),
                                   key=f"bwf_{slug}", placeholder="e.g. abc123def456...",
                                   help="Wordfence security plugin license key.")
+    with col_gtm:
+        gtm = st.text_input("GTM ID", value=r_data.get('gtm_id', ''),
+                             key=f"bgtm_{slug}", placeholder="e.g. GTM-XXXXXXX",
+                             help="Google Tag Manager container ID.")
 
     st.markdown("---")
     if st.button("Save IDs", type="primary", key=f"brs_save_{slug}"):
         db.update_restaurant(slug, booking_platform=booking_val,
                              opentable_rid=ot, resy_url=rs,
                              tripleseat_form_id=ts, onetrust_id=onetrust,
-                             wordfence_api_key=wordfence)
+                             wordfence_api_key=wordfence, gtm_id=gtm)
         st.success("Saved!")
         st.rerun()
 
