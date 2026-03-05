@@ -440,3 +440,34 @@ def save_all_copy(name, copy_dict):
             ON CONFLICT(restaurant, section_id) DO UPDATE SET content = excluded.content
         """, (name, section_id, content))
     _commit(conn)
+
+
+def get_all_image_counts():
+    """Return dicts of restaurant -> image count and chef count (single query)."""
+    conn = get_connection()
+    cur = conn.execute(
+        "SELECT restaurant, field_name FROM images WHERE image_data IS NOT NULL"
+    )
+    rows = _rows_to_dicts(cur)
+    img_counts = {}
+    chef_counts = {}
+    chef_fields = ('Chef_1', 'Chef_2', 'Chef_3', 'Logo', 'Favicon')
+    for r in rows:
+        name = r['restaurant']
+        fn = r['field_name']
+        if fn in ('Chef_1', 'Chef_2', 'Chef_3'):
+            chef_counts[name] = chef_counts.get(name, 0) + 1
+        elif fn not in ('Logo', 'Favicon'):
+            img_counts[name] = img_counts.get(name, 0) + 1
+    return img_counts, chef_counts
+
+
+def get_all_copy_counts():
+    """Return dict of restaurant -> count of non-empty copy sections (single query)."""
+    conn = get_connection()
+    cur = conn.execute(
+        "SELECT restaurant, COUNT(*) as cnt FROM copy_sections "
+        "WHERE content != '' GROUP BY restaurant"
+    )
+    rows = _rows_to_dicts(cur)
+    return {r['restaurant']: r['cnt'] for r in rows}

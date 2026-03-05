@@ -60,27 +60,16 @@ def _show_list_view():
     menu_slugs = {m['restaurant'] for m in menus_list}
     menu_dates = {m['restaurant']: m.get('updated_at', '') for m in menus_list}
 
-    # Pre-compute progress
-    img_counts = {}
-    chef_counts = {}
-    copy_counts = {}
+    # Pre-compute progress using bulk queries (2 DB calls instead of 76+)
+    img_counts, chef_counts = db.get_all_image_counts()
+    copy_counts = db.get_all_copy_counts()
     brand_ok = {}
     ids_ok = {}
     links_ok = {}
     contact_ok = {}
     for r in restaurants:
         s = r['name']
-        imgs = db.get_images_for_restaurant(s)
-        img_counts[s] = sum(1 for k, v in imgs.items()
-                            if v.get('has_image') and k not in ('Chef_1', 'Chef_2', 'Chef_3',
-                                                                 'Logo', 'Favicon'))
-        chef_counts[s] = sum(1 for k, v in imgs.items()
-                             if v.get('has_image') and k in ('Chef_1', 'Chef_2', 'Chef_3'))
-        cp = db.get_copy_for_restaurant(s)
-        copy_counts[s] = sum(1 for v in cp.values() if v.strip())
-        # Brand: has logo or primary color
-        has_logo = any(k in imgs and imgs[k].get('has_image') for k in ('Logo',))
-        brand_ok[s] = bool(has_logo or r.get('primary_color'))
+        brand_ok[s] = bool(r.get('primary_color'))
         # IDs: must have booking platform ID (OT or Resy) AND tripleseat
         has_booking = bool(r.get('opentable_rid') or r.get('resy_url'))
         has_tripleseat = bool(r.get('tripleseat_form_id'))

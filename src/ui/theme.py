@@ -39,7 +39,7 @@ def inject_css():
     .block-container {
         padding-top: 4rem !important;
         padding-bottom: 2rem !important;
-        max-width: 1400px !important;
+        max-width: 100% !important;
     }
 
     img { border-radius: 0 !important; }
@@ -548,7 +548,7 @@ def inject_css():
 
     /* Widen the main content area */
     .block-container {
-        max-width: 1400px !important;
+        max-width: 100% !important;
     }
     </style>
     """, unsafe_allow_html=True)
