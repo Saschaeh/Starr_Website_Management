@@ -182,6 +182,17 @@ def inject_css():
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
+    /* Reorder sidebar: title above nav links */
+    [data-testid="stSidebar"] > div:first-child {
+        display: flex;
+        flex-direction: column;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
+        order: 2;
+    }
+    [data-testid="stSidebar"] .sidebar-title-wrapper {
+        order: 1;
+    }
     /* Sidebar title */
     .sidebar-title {
         font-family: 'DM Sans', sans-serif;
