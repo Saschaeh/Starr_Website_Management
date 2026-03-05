@@ -183,33 +183,43 @@ def inject_css():
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
-    /* Sidebar "Restaurants" toggle — match native nav links */
+    /* Sidebar "Restaurants" toggle — pixel-match native nav links */
     [data-testid="stSidebar"] [class*="st-key-sidebar_restaurants_toggle"] button {
         background: none !important;
         border: none !important;
+        box-shadow: none !important;
         color: #FFFFFF !important;
-        font-size: 0.9rem !important;
+        font-size: 14px !important;
         font-weight: 500 !important;
-        padding: 0.4rem 0.75rem !important;
+        padding: 0.35rem 0.75rem !important;
         min-height: 0 !important;
+        height: auto !important;
         text-align: left !important;
         justify-content: flex-start !important;
         width: 100% !important;
         border-radius: 0.5rem !important;
+        line-height: 1.6 !important;
+        font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, sans-serif !important;
     }
     [data-testid="stSidebar"] [class*="st-key-sidebar_restaurants_toggle"] button:hover {
         color: #C5A258 !important;
         background: rgba(255,255,255,0.05) !important;
     }
+    [data-testid="stSidebar"] [class*="st-key-sidebar_restaurants_toggle"] button p {
+        font-size: 14px !important;
+        color: #FFFFFF !important;
+    }
     /* Sidebar restaurant sub-items — indented */
     [data-testid="stSidebar"] [class*="st-key-sidebar_"] button {
         background: none !important;
         border: none !important;
+        box-shadow: none !important;
         color: rgba(255,255,255,0.65) !important;
         font-size: 0.8rem !important;
         font-weight: 400 !important;
-        padding: 0.2rem 0.75rem 0.2rem 2.5rem !important;
+        padding: 0.15rem 0.75rem 0.15rem 2.5rem !important;
         min-height: 0 !important;
+        height: auto !important;
         text-align: left !important;
         justify-content: flex-start !important;
     }

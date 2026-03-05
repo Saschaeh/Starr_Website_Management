@@ -45,14 +45,13 @@ batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
 pg = st.navigation([dashboard, batch])
 
-# --- Sidebar: Restaurants expandable section ---
+# --- Sidebar: Restaurant list (injected via CSS to look like native nav) ---
 from src.db import get_all_restaurants
 from src.restaurant_registry import display_name
 
 with st.sidebar:
     expanded = st.session_state.get('_sidebar_restaurants', False)
-    arrow = "expand_less" if expanded else "expand_more"
-    if st.button(f":material/restaurant:  Restaurants", key="sidebar_restaurants_toggle"):
+    if st.button("Restaurants", key="sidebar_restaurants_toggle"):
         st.session_state['_sidebar_restaurants'] = not expanded
         st.rerun()
     if expanded:
