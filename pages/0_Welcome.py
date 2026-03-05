@@ -157,9 +157,9 @@ with f2:
     st.markdown(_feature_card.format(
         icon="&#128221;",
         title="Website Copy",
-        desc="Generate on-brand website copy and SEO meta tags in seconds. "
-             "Pulls context from your live site, follows your brand voice guidelines, "
-             "and produces publish-ready content for every restaurant."
+        desc="Generates on-brand website copy and SEO meta tags for every restaurant. "
+             "Currently pulls context from your live sites, with future support "
+             "for pulling from documents and brand guidelines."
     ), unsafe_allow_html=True)
 
 with f3:
