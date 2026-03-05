@@ -197,11 +197,18 @@ def _show_list_view():
             # Checkbox
             with cols[0]:
                 st.checkbox(dname, key=f"sel_{slug}", label_visibility="collapsed")
-            # Name
+            # Name + website link
             with cols[1]:
-                if st.button(f"{dname}", key=f"row_{slug}"):
-                    st.session_state['selected_restaurant'] = slug
-                    st.rerun()
+                wurl = r.get('website_url', '')
+                if wurl:
+                    if st.button(f"{dname}", key=f"row_{slug}"):
+                        st.session_state['selected_restaurant'] = slug
+                        st.rerun()
+                    st.markdown(f'<a href="{wurl}" target="_blank" style="font-size:0.7rem;color:#6B7280;text-decoration:none;margin-top:-0.5rem;display:block;">&#128279; site</a>', unsafe_allow_html=True)
+                else:
+                    if st.button(f"{dname}", key=f"row_{slug}"):
+                        st.session_state['selected_restaurant'] = slug
+                        st.rerun()
             # Menu
             with cols[2]:
                 if has_menu:
@@ -300,8 +307,6 @@ def _show_add_form():
     with c2:
         new_url = st.text_input("Website URL", placeholder="https://barclayprime.com",
                                 key="add_url")
-    detect_on_add = st.checkbox("Auto-detect brand data on add", value=True,
-                                key="add_detect")
     a1, a2 = st.columns([1, 3])
     with a1:
         if st.button("Add Restaurant", type="primary", disabled=not (new_name or '').strip(),
@@ -312,30 +317,6 @@ def _show_add_form():
             else:
                 dn = display_name(new_name.strip())
                 db.add_restaurant(slug, dn, website_url=(new_url or '').strip())
-                if detect_on_add and (new_url or '').strip():
-                    try:
-                        from src.cms.brand_detector import scrape_website
-                        with st.spinner("Detecting brand data..."):
-                            ok, text, err, det = scrape_website(new_url.strip())
-                            if ok and det:
-                                flds = {k: det[k] for k in (
-                                    'primary_color', 'opentable_rid', 'resy_url',
-                                    'tripleseat_form_id', 'mailing_list_url',
-                                    'facebook_url', 'instagram_url', 'phone',
-                                    'email_general', 'email_events', 'email_marketing',
-                                    'email_press', 'address', 'google_maps_url',
-                                    'order_online_url') if det.get(k)}
-                                if det.get('booking'):
-                                    flds['booking_platform'] = det['booking']
-                                if det.get('address'):
-                                    flds['address'] = det['address']
-                                    detected_city = city_from_address(det['address'])
-                                    if detected_city:
-                                        flds['city'] = detected_city
-                                if flds:
-                                    db.update_restaurant(slug, **flds)
-                    except Exception as e:
-                        st.warning(f"Auto-detect failed: {e}")
                 st.success(f"Added **{dn}**!")
                 st.session_state['selected_restaurant'] = slug
                 st.session_state.pop('show_add_form', None)
