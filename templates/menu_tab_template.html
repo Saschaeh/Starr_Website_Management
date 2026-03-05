@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #6b6560;
+    --accent: {{ accent_color }};
+    --accent-light: {{ accent_light }};
+    --border: #e0dbd4;
+    --tag-bg: #eee8df;
+    --supplement: #c17b2a;
+    --col-gap: 28px;
+    --section-gap: 28px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    padding: 24px 0;
+  }
+
+  .tab-description {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 24px;
+    margin-bottom: 24px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+    border-radius: 8px;
+  }
+
+{% include '_menu_card_styles.html' %}
+
+  @media (max-width: 900px) {
+    .columns { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+{% if tab.description %}
+<div class="tab-description">{{ tab.description }}</div>
+{% endif %}
+
+<div class="columns columns-{{ tab.columns | length }}">
+  {% for column in tab.columns %}
+  <div class="column">
+    <div class="column-label">Column {{ loop.index }}</div>
+
+    {% for section in column.sections %}
+    <div class="menu-section">
+      <div class="section-title">{{ section.title }}</div>
+      {% if section.note %}
+      <div class="section-note">{{ section.note }}</div>
+      {% endif %}
+
+      {% for item in section.items %}
+      <div class="menu-item">
+        <div class="item-header">
+          <span class="item-name">{{ item.name }}{% if item.raw %}<span class="raw-marker">*</span>{% endif %}</span>
+          {% if item.supplement %}
+          <span class="item-supplement">{{ item.supplement }}</span>
+          {% endif %}
+          {% if item.price %}
+          <span class="item-price">{{ item.price }}</span>
+          {% endif %}
+        </div>
+        {% if item.description %}
+        <div class="item-desc">{{ item.description }}</div>
+        {% endif %}
+        {% if item.tags %}
+        <div class="item-tags">
+          {% for tag in item.tags %}
+          <span class="tag">{{ tag }}</span>
+          {% endfor %}
+        </div>
+        {% endif %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endfor %}
+</div>
+
+{% if tab.footnote %}
+<div class="footnotes">
+  <strong>*</strong> {{ tab.footnote }}
+</div>
+{% endif %}
+
+<script>
+  function autoHeight() {
+    try {
+      const h = document.documentElement.scrollHeight;
+      const frame = window.frameElement;
+      if (frame) {
+        frame.style.height = h + 'px';
+        if (frame.parentElement) frame.parentElement.style.height = h + 'px';
+      }
+    } catch(e) {}
+  }
+  window.addEventListener('load', autoHeight);
+  new ResizeObserver(autoHeight).observe(document.body);
+</script>
+
+</body>
+</html>

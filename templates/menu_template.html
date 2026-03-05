@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>{{ restaurant.name }} — Menu Preview</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --text: #1a1a1a;
+    --text-muted: #6b6560;
+    --accent: {{ restaurant.accent_color }};
+    --accent-light: {{ restaurant.accent_light }};
+    --border: #e0dbd4;
+    --tag-bg: #eee8df;
+    --supplement: #c17b2a;
+    --col-gap: 28px;
+    --section-gap: 28px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .page-header {
+    background: var(--text);
+    color: var(--bg);
+    padding: 32px 48px 24px;
+  }
+  .page-header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .page-header p {
+    font-size: 13px;
+    color: #a09888;
+    margin-top: 6px;
+  }
+
+  .tabs-bar {
+    background: var(--text);
+    padding: 0 48px;
+    display: flex;
+    gap: 0;
+    border-bottom: 1px solid #333;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .tab-btn {
+    background: none;
+    border: none;
+    color: #a09888;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    padding: 14px 24px;
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+  }
+  .tab-btn:hover { color: var(--bg); }
+  .tab-btn.active {
+    color: var(--bg);
+    border-bottom-color: var(--accent-light);
+  }
+
+  .tab-description {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 48px;
+    font-size: 13px;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+
+  .tab-content { display: none; padding: 32px 48px 48px; }
+  .tab-content.active { display: block; }
+
+{% include '_menu_card_styles.html' %}
+
+  @media (max-width: 1100px) {
+    .columns { grid-template-columns: 1fr; }
+    .tabs-bar, .page-header, .tab-content, .tab-description { padding-left: 24px; padding-right: 24px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <h1>{{ restaurant.name }}</h1>
+  <p>Menu Preview</p>
+</div>
+
+{% if restaurant.tabs | length > 1 %}
+<div class="tabs-bar" id="tabsBar">
+  {% for tab in restaurant.tabs %}
+  <button class="tab-btn{% if loop.first %} active{% endif %}" data-tab="{{ tab.id }}">{{ tab.label }}</button>
+  {% endfor %}
+</div>
+{% endif %}
+
+{% for tab in restaurant.tabs %}
+<div class="tab-content{% if loop.first %} active{% endif %}" id="{{ tab.id }}">
+  {% if tab.description %}
+  <div class="tab-description">{{ tab.description }}</div>
+  {% endif %}
+
+  <div class="columns columns-{{ tab.columns | length }}">
+    {% for column in tab.columns %}
+    <div class="column">
+      <div class="column-label">Column {{ loop.index }}</div>
+
+      {% for section in column.sections %}
+      <div class="menu-section">
+        <div class="section-title">{{ section.title }}</div>
+        {% if section.note %}
+        <div class="section-note">{{ section.note }}</div>
+        {% endif %}
+
+        {% for item in section.items %}
+        <div class="menu-item">
+          <div class="item-header">
+            <span class="item-name">{{ item.name }}{% if item.raw %}<span class="raw-marker">*</span>{% endif %}</span>
+            {% if item.supplement %}
+            <span class="item-supplement">{{ item.supplement }}</span>
+            {% endif %}
+            {% if item.price %}
+            <span class="item-price">{{ item.price }}</span>
+            {% endif %}
+          </div>
+          {% if item.description %}
+          <div class="item-desc">{{ item.description }}</div>
+          {% endif %}
+          {% if item.tags %}
+          <div class="item-tags">
+            {% for tag in item.tags %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+          </div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if tab.footnote %}
+  <div class="footnotes">
+    <strong>*</strong> {{ tab.footnote }}
+  </div>
+  {% endif %}
+</div>
+{% endfor %}
+
+<script>
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById(btn.dataset.tab).classList.add('active');
+    });
+  });
+
+</script>
+
+</body>
+</html>
