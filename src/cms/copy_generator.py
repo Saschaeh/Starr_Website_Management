@@ -1,11 +1,11 @@
-"""Marketing copy generation using HuggingFace Inference API."""
+"""Marketing copy generation using Anthropic Claude API."""
 
 import json
 import os
 import re
 
 import streamlit as st
-from huggingface_hub import InferenceClient
+import anthropic
 
 # Copy sections: (id, label, word_min, word_max, description)
 COPY_SECTIONS = [
@@ -53,9 +53,15 @@ MASTER_INSTRUCTIONS_FILE = os.path.join(
 )
 
 
-@st.cache_resource
-def _get_hf_client(token):
-    return InferenceClient(token=token)
+def _get_api_key():
+    """Get Anthropic API key from secrets or env."""
+    try:
+        key = st.secrets.get("ANTHROPIC_API_KEY", None)
+    except Exception:
+        key = None
+    if not key:
+        key = os.getenv("ANTHROPIC_API_KEY", "")
+    return key
 
 
 def load_master_instructions():
@@ -75,13 +81,13 @@ def save_master_instructions(instructions):
 
 
 def generate_copy(website_text, restaurant_name, section=None, instructions=None):
-    """Generate marketing copy from website text using HF Inference API.
+    """Generate marketing copy from website text using Claude.
 
     Returns (success: bool, copy_dict: dict, error: str).
     """
-    api_token = st.session_state.get('hf_api_token', '')
-    if not api_token:
-        return False, {}, "HF API token not configured. Add HF_API_TOKEN to .env file."
+    api_key = _get_api_key()
+    if not api_key:
+        return False, {}, "Anthropic API key not configured. Add ANTHROPIC_API_KEY to secrets."
 
     if not instructions:
         instructions = DEFAULT_COPY_INSTRUCTIONS
@@ -120,25 +126,21 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
         max_tokens = 1500
 
     try:
-        client = _get_hf_client(api_token)
-        result = client.chat_completion(
-            model="Qwen/Qwen2.5-7B-Instruct",
-            messages=[{"role": "user", "content": prompt}],
+        client = anthropic.Anthropic(api_key=api_key)
+        result = client.messages.create(
+            model="claude-sonnet-4-5",
             max_tokens=max_tokens,
+            messages=[{"role": "user", "content": prompt}],
         )
-        response_text = result.choices[0].message.content.strip()
+        response_text = result.content[0].text.strip()
+    except anthropic.AuthenticationError:
+        return False, {}, "Invalid Anthropic API key."
+    except anthropic.RateLimitError:
+        return False, {}, "Rate limit reached. Please wait a minute and try again."
+    except anthropic.APIStatusError as e:
+        return False, {}, f"API error: {e.message}"
     except Exception as e:
-        error_str = str(e).lower()
-        if '401' in error_str or 'unauthorized' in error_str:
-            return False, {}, "Invalid HF token in .env file."
-        elif '403' in error_str or 'permission' in error_str:
-            return False, {}, "HF token needs 'Inference Providers' permission."
-        elif '503' in error_str or 'loading' in error_str:
-            return False, {}, "Model is loading, please try again in a few seconds."
-        elif '429' in error_str or 'rate' in error_str:
-            return False, {}, "Rate limit reached. Please wait a minute and try again."
-        else:
-            return False, {}, "Copy generation temporarily unavailable."
+        return False, {}, f"Copy generation failed: {e}"
 
     if section:
         return True, {section: response_text}, ""
