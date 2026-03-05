@@ -185,14 +185,32 @@ def inject_css():
     }
     /* Reorder sidebar: title above nav links */
     [data-testid="stSidebar"] > div:first-child {
-        display: flex;
-        flex-direction: column;
+        display: flex !important;
+        flex-direction: column !important;
+        padding-top: 0.5rem !important;
+        gap: 0 !important;
     }
     [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
-        order: 2;
+        order: 2 !important;
+        padding: 0 !important;
+        margin: 0 !important;
     }
     [data-testid="stSidebar"] .sidebar-title-wrapper {
-        order: 1;
+        order: 1 !important;
+    }
+    /* Kill ALL internal spacing in sidebar */
+    [data-testid="stSidebar"] > div:first-child > * {
+        margin: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] ul {
+        padding: 0 !important;
+        margin: 0 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] > div {
+        padding: 0 !important;
+        margin: 0 !important;
     }
     /* Sidebar title */
     .sidebar-title {
@@ -202,20 +220,8 @@ def inject_css():
         font-weight: 600;
         letter-spacing: 0.15em;
         text-transform: uppercase;
-        padding: 0.5rem 1rem 0;
+        padding: 0 1rem 0.25rem 1rem;
         margin: 0;
-    }
-    .sidebar-title-wrapper {
-        margin: 0 !important;
-        padding: 0 !important;
-    }
-    /* Kill all gaps between sidebar children */
-    [data-testid="stSidebar"] > div:first-child > * {
-        margin-top: 0 !important;
-        margin-bottom: 0 !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] ul {
-        padding-top: 0 !important;
     }
 
     /* === PROGRESS PILLS === */
