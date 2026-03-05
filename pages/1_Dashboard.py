@@ -200,15 +200,14 @@ def _show_list_view():
             # Name + website link
             with cols[1]:
                 wurl = r.get('website_url', '')
-                if wurl:
+                nc1, nc2 = st.columns([4, 1])
+                with nc1:
                     if st.button(f"{dname}", key=f"row_{slug}"):
                         st.session_state['selected_restaurant'] = slug
                         st.rerun()
-                    st.markdown(f'<a href="{wurl}" target="_blank" style="font-size:0.7rem;color:#6B7280;text-decoration:none;margin-top:-0.5rem;display:block;">&#128279; site</a>', unsafe_allow_html=True)
-                else:
-                    if st.button(f"{dname}", key=f"row_{slug}"):
-                        st.session_state['selected_restaurant'] = slug
-                        st.rerun()
+                with nc2:
+                    if wurl:
+                        st.markdown(f'<a href="{wurl}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>', unsafe_allow_html=True)
             # Menu
             with cols[2]:
                 if has_menu:
