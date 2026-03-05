@@ -371,9 +371,11 @@ def _show_detail_view(slug):
     # Restaurant header
     hc1, hc2 = st.columns([3, 1])
     with hc1:
+        wurl = r_data.get("website_url", "")
+        link_html = f' <a href="{wurl}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>' if wurl else ''
         st.markdown(
             f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
-            f'font-weight:600;margin:0;">{dname}</h1>'
+            f'font-weight:600;margin:0;">{dname}{link_html}</h1>'
             f'<p style="color:#6B7280;font-size:0.9rem;margin-top:4px;">{city}</p>',
             unsafe_allow_html=True)
     with hc2:
@@ -1098,34 +1100,7 @@ def _render_copy_tab(slug, r_data, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _render_brand_tab(slug, r_data, dname):
-    from src.cms.brand_detector import scrape_website
-
-    wurl = r_data.get('website_url', '')
-    if wurl:
-        if st.button("Auto-Detect Brand", type="primary", key=f"bd_{slug}"):
-            with st.spinner("Detecting..."):
-                ok, text, error, detected = scrape_website(wurl)
-            if ok and detected:
-                fields = {}
-                for k in ('primary_color', 'booking_platform', 'opentable_rid',
-                          'resy_url', 'tripleseat_form_id', 'mailing_list_url',
-                          'facebook_url', 'instagram_url', 'phone',
-                          'email_general', 'email_events', 'email_marketing',
-                          'email_press', 'address', 'google_maps_url', 'order_online_url'):
-                    dk = k if k != 'booking_platform' else 'booking'
-                    val = detected.get(dk, '')
-                    if val:
-                        fields[k] = val
-                if fields:
-                    db.update_restaurant(slug, **fields)
-                    st.success(f"Updated {len(fields)} field(s)!")
-                    st.rerun()
-                else:
-                    st.info("No new data detected.")
-            elif error:
-                st.error(error)
-
-    # ── Brand Identity: Logo + Favicon + Color (3-column) ──
+        # ── Brand Identity: Logo + Favicon + Color (3-column) ──
     st.subheader("Brand Identity")
     col_logo, col_favicon, col_color = st.columns([2, 1, 3])
 
@@ -1175,11 +1150,36 @@ def _render_brand_tab(slug, r_data, dname):
                                 key=f"bh_{slug}", label_visibility="collapsed")
 
     st.markdown("---")
-    if st.button("Save Brand Data", type="primary", key=f"bs_{slug}"):
-        fields = {'primary_color': hx}
-        db.update_restaurant(slug, **fields)
-        st.success("Saved!")
-        st.rerun()
+    bc1, bc2 = st.columns([1, 1], gap="small")
+    with bc1:
+        if st.button("Save Brand Data", type="primary", key=f"bs_{slug}"):
+            fields = {'primary_color': hx}
+            db.update_restaurant(slug, **fields)
+            st.success("Saved!")
+            st.rerun()
+    with bc2:
+        if st.button("Detect from Website", key=f"bd_detect_{slug}"):
+            url = r_data.get('website_url', '')
+            if not url:
+                st.warning("No website URL set. Add one in the Overview tab first.")
+            else:
+                from src.cms.brand_detector import scrape_website
+                with st.spinner(f"Scraping {url}..."):
+                    ok, _, err, detected = scrape_website(url)
+                if not ok:
+                    st.error(f"Could not scrape: {err}")
+                elif detected:
+                    updates = {}
+                    if detected.get('primary_color'):
+                        updates['primary_color'] = detected['primary_color']
+                    if detected.get('booking'):
+                        updates['booking_platform'] = detected['booking']
+                    if updates:
+                        db.update_restaurant(slug, **updates)
+                        st.success(f"Detected: {', '.join(updates.keys())}")
+                        st.rerun()
+                    else:
+                        st.info("No new brand data detected.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1222,7 +1222,7 @@ def _render_reservations_tab(slug, r_data, dname):
                              help="Google Tag Manager container ID.")
 
     st.markdown("---")
-    dc1, dc2, _ = st.columns([1, 1.2, 3])
+    dc1, dc2 = st.columns([1, 1], gap="small")
     with dc1:
         if st.button("Save IDs", type="primary", key=f"brs_save_{slug}"):
             db.update_restaurant(slug, booking_platform=booking_val,
@@ -1283,11 +1283,35 @@ def _render_links_tab(slug, r_data, dname):
         ig = st.text_input("Instagram", value=r_data.get('instagram_url', ''), key=f"big_{slug}")
 
     st.markdown("---")
-    if st.button("Save Links", type="primary", key=f"blnk_save_{slug}"):
-        db.update_restaurant(slug, mailing_list_url=ml, order_online_url=oo,
-                             facebook_url=fb, instagram_url=ig)
-        st.success("Saved!")
-        st.rerun()
+    bc1, bc2 = st.columns([1, 1], gap="small")
+    with bc1:
+        if st.button("Save Links", type="primary", key=f"blnk_save_{slug}"):
+            db.update_restaurant(slug, mailing_list_url=ml, order_online_url=oo,
+                                 facebook_url=fb, instagram_url=ig)
+            st.success("Saved!")
+            st.rerun()
+    with bc2:
+        if st.button("Detect from Website", key=f"blnk_detect_{slug}"):
+            url = r_data.get('website_url', '')
+            if not url:
+                st.warning("No website URL set. Add one in the Overview tab first.")
+            else:
+                from src.cms.brand_detector import scrape_website
+                with st.spinner(f"Scraping {url}..."):
+                    ok, _, err, detected = scrape_website(url)
+                if not ok:
+                    st.error(f"Could not scrape: {err}")
+                elif detected:
+                    updates = {}
+                    for k in ('mailing_list_url', 'order_online_url', 'facebook_url', 'instagram_url'):
+                        if detected.get(k) and not r_data.get(k):
+                            updates[k] = detected[k]
+                    if updates:
+                        db.update_restaurant(slug, **updates)
+                        st.success(f"Detected: {', '.join(updates.keys())}")
+                        st.rerun()
+                    else:
+                        st.info("No new links detected.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1307,12 +1331,41 @@ def _render_contact_tab(slug, r_data, dname):
         ep = st.text_input("Email (Press)", value=r_data.get('email_press', ''), key=f"bep_{slug}")
 
     st.markdown("---")
-    if st.button("Save Contact Info", type="primary", key=f"bloc_save_{slug}"):
-        db.update_restaurant(slug, phone=ph_val, address=addr, google_maps_url=gm,
-                             email_general=eg, email_events=ee,
-                             email_marketing=em, email_press=ep)
-        st.success("Saved!")
-        st.rerun()
+    bc1, bc2 = st.columns([1, 1], gap="small")
+    with bc1:
+        if st.button("Save Contact Info", type="primary", key=f"bloc_save_{slug}"):
+            db.update_restaurant(slug, phone=ph_val, address=addr, google_maps_url=gm,
+                                 email_general=eg, email_events=ee,
+                                 email_marketing=em, email_press=ep)
+            st.success("Saved!")
+            st.rerun()
+    with bc2:
+        if st.button("Detect from Website", key=f"bloc_detect_{slug}"):
+            url = r_data.get('website_url', '')
+            if not url:
+                st.warning("No website URL set. Add one in the Overview tab first.")
+            else:
+                from src.cms.brand_detector import scrape_website
+                with st.spinner(f"Scraping {url}..."):
+                    ok, _, err, detected = scrape_website(url)
+                if not ok:
+                    st.error(f"Could not scrape: {err}")
+                elif detected:
+                    updates = {}
+                    for k in ('phone', 'address', 'google_maps_url',
+                              'email_general', 'email_events', 'email_marketing', 'email_press'):
+                        if detected.get(k) and not r_data.get(k):
+                            updates[k] = detected[k]
+                    if detected.get('address'):
+                        detected_city = city_from_address(detected['address'])
+                        if detected_city and r_data.get('city', '') in ('', 'Other'):
+                            updates['city'] = detected_city
+                    if updates:
+                        db.update_restaurant(slug, **updates)
+                        st.success(f"Detected: {', '.join(updates.keys())}")
+                        st.rerun()
+                    else:
+                        st.info("No new contact info detected.")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
