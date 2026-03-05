@@ -1274,11 +1274,13 @@ def _render_contact_tab(slug, r_data, dname):
 # ROUTING
 # ═══════════════════════════════════════════════════════════════════════════
 
-_selected = st.session_state.get('selected_restaurant')
+def run():
+    _selected = st.session_state.get('selected_restaurant')
+    if _selected and db.get_restaurant(_selected):
+        _show_detail_view(_selected)
+    elif st.session_state.get('show_add_form'):
+        _show_add_form()
+    else:
+        _show_list_view()
 
-if _selected and db.get_restaurant(_selected):
-    _show_detail_view(_selected)
-elif st.session_state.get('show_add_form'):
-    _show_add_form()
-else:
-    _show_list_view()
+run()

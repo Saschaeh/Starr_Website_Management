@@ -41,20 +41,17 @@ render_header()
 
 # --- Navigation ---
 dashboard = st.Page("pages/1_Dashboard.py", title="Progress", icon=":material/bar_chart:", default=True)
+restaurants = st.Page("pages/3_Restaurants.py", title="Restaurants", icon=":material/restaurant:")
 batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
-pg = st.navigation([dashboard, batch])
+pg = st.navigation([dashboard, restaurants, batch])
 
-# --- Sidebar: Restaurant list (injected via CSS to look like native nav) ---
+# --- Sidebar: Restaurant sub-list when expanded ---
 from src.db import get_all_restaurants
 from src.restaurant_registry import display_name
 
-with st.sidebar:
-    expanded = st.session_state.get('_sidebar_restaurants', False)
-    if st.button("Restaurants", key="sidebar_restaurants_toggle"):
-        st.session_state['_sidebar_restaurants'] = not expanded
-        st.rerun()
-    if expanded:
+if st.session_state.get('_sidebar_restaurants'):
+    with st.sidebar:
         for r in get_all_restaurants():
             name = r['name']
             dname = r.get('display_name') or display_name(name)
