@@ -206,8 +206,8 @@ def _show_list_view():
                         st.session_state['selected_restaurant'] = slug
                         st.rerun()
                 with nc2:
-                    if wurl:
-                        st.markdown(f'<a href="{wurl}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>', unsafe_allow_html=True)
+                    stg_url = f"https://stg-{slug}-staging.kinsta.cloud"
+                    st.markdown(f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>', unsafe_allow_html=True)
             # Menu
             with cols[2]:
                 if has_menu:
@@ -351,8 +351,8 @@ def _show_detail_view(slug):
     # Restaurant header
     hc1, hc2 = st.columns([3, 1])
     with hc1:
-        wurl = r_data.get("website_url", "")
-        link_html = f' <a href="{wurl}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>' if wurl else ''
+        stg_url = f"https://stg-{slug}-staging.kinsta.cloud"
+        link_html = f' <a href="{stg_url}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>'
         st.markdown(
             f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
             f'font-weight:600;margin:0;">{dname}{link_html}</h1>'
