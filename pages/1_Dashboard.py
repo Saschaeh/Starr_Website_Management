@@ -183,6 +183,8 @@ def _show_list_view():
 
     _check = '<span style="color:#22C55E;font-weight:700;">&#10003;</span>'
     _dash = '<span style="color:#D1D5DB;">—</span>'
+    _x_red = '<span style="color:#EF4444;font-weight:700;">&#10005;</span>'
+    _x_orange = '<span style="color:#F59E0B;font-weight:700;">&#10005;</span>'
 
     # --- Restaurant rows ---
     if not filtered:
@@ -212,7 +214,7 @@ def _show_list_view():
                 if has_menu:
                     st.markdown(_check, unsafe_allow_html=True)
                 else:
-                    st.markdown(_dash, unsafe_allow_html=True)
+                    st.markdown(_x_red, unsafe_allow_html=True)
             # Images (x/9)
             with cols[3]:
                 if ic > 0:
@@ -241,11 +243,11 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # Links
             with cols[8]:
-                st.markdown(_check if links_ok.get(slug) else _dash,
+                st.markdown(_check if links_ok.get(slug) else _x_orange,
                             unsafe_allow_html=True)
             # Contact
             with cols[9]:
-                st.markdown(_check if contact_ok.get(slug) else _dash,
+                st.markdown(_check if contact_ok.get(slug) else _x_orange,
                             unsafe_allow_html=True)
 
     # --- Handle Edit / Delete actions ---
