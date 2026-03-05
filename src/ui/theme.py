@@ -183,27 +183,16 @@ def inject_css():
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
-    /* Reorder sidebar: title first, then nav */
-    [data-testid="stSidebar"] > div > div:first-child {
-        display: flex !important;
-        flex-direction: column !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
-        order: 2 !important;
-    }
-    [data-testid="stSidebar"] [data-testid="stSidebarContent"] > div:has(.sidebar-title) {
-        order: 1 !important;
-    }
-    /* Sidebar title */
-    .sidebar-title {
+    /* Sidebar title via ::before on nav */
+    [data-testid="stSidebarNav"]::before {
+        content: "MANAGEMENT TOOLS";
+        display: block;
         font-family: 'DM Sans', sans-serif;
         color: #C5A258;
         font-size: 0.72rem;
         font-weight: 600;
         letter-spacing: 0.15em;
-        text-transform: uppercase;
-        padding: 0 0 0.4rem 0;
-        margin: 0;
+        padding: 0 1rem 0.4rem 1rem;
     }
 
     /* === PROGRESS PILLS === */
