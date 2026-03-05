@@ -200,6 +200,8 @@ def _detect_site_metadata(html_bytes):
         'email_marketing': '', 'email_press': '',
         'address': '', 'google_maps_url': '',
         'order_online_url': '',
+        'spotify_url': '',
+        'linkedin_url': '',
     }
 
     # Booking platform
@@ -260,6 +262,16 @@ def _detect_site_metadata(html_bytes):
         slug = ig_match.group(1).rstrip('/')
         if slug.lower() not in ('starrrestaurants', 'starr_restaurants', 'starr.restaurants'):
             result['instagram_url'] = f"https://www.instagram.com/{slug}"
+
+    # Spotify
+    sp_match = re.search(r"href=[\"\x27]https?://open\.spotify\.com/([^\"\x27]+)[\"\x27]", html_str, re.IGNORECASE)
+    if sp_match:
+        result['spotify_url'] = "https://open.spotify.com/" + sp_match.group(1).rstrip('/')
+
+    # LinkedIn
+    li_match = re.search(r"href=[\"\x27]https?://(?:www\.)?linkedin\.com/(?:company|in)/([^\"\x27]+)[\"\x27]", html_str, re.IGNORECASE)
+    if li_match:
+        result['linkedin_url'] = "https://www.linkedin.com/company/" + li_match.group(1).rstrip('/')
 
     # Phone
     tel_match = re.search(r'href=["\']tel:([^"\']+)["\']', html_str, re.IGNORECASE)

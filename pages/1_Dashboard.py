@@ -1381,7 +1381,7 @@ def _render_links_tab(slug, r_data, dname):
                     st.error(f"Could not scrape: {err}")
                 elif detected:
                     updates = {}
-                    for k in ('mailing_list_url', 'order_online_url', 'facebook_url', 'instagram_url'):
+                    for k in ('mailing_list_url', 'order_online_url', 'facebook_url', 'instagram_url', 'spotify_url', 'linkedin_url'):
                         if detected.get(k):
                             updates[k] = detected[k]
                     if updates:
