@@ -1213,11 +1213,18 @@ def _render_reservations_tab(slug, r_data, dname):
                                  key=f"bont_{slug}", placeholder="e.g. 01234567-abcd-...",
                                  help="OneTrust cookie consent domain script ID.")
 
+    col_wf, _wf_sp = st.columns(2)
+    with col_wf:
+        wordfence = st.text_input("Wordfence API Key", value=r_data.get('wordfence_api_key', ''),
+                                  key=f"bwf_{slug}", placeholder="e.g. abc123def456...",
+                                  help="Wordfence security plugin license key.")
+
     st.markdown("---")
     if st.button("Save IDs", type="primary", key=f"brs_save_{slug}"):
         db.update_restaurant(slug, booking_platform=booking_val,
                              opentable_rid=ot, resy_url=rs,
-                             tripleseat_form_id=ts, onetrust_id=onetrust)
+                             tripleseat_form_id=ts, onetrust_id=onetrust,
+                             wordfence_api_key=wordfence)
         st.success("Saved!")
         st.rerun()
 
