@@ -697,7 +697,7 @@ def _render_menu_edit(slug, restaurant_model):
                         sd['items'].append({'name': '', 'price': None, 'description': None,
                                             'raw': False, 'supplement': None, 'tags': []})
                         st.rerun()
-    cs, cc = st.columns(2)
+    cs, cc, _sp = st.columns([1, 1, 8])
     with cs:
         if st.button("Save", key=f"es_{slug}", type="primary"):
             db.save_menu(slug, RestModel.model_validate(data))
