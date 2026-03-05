@@ -183,6 +183,39 @@ def inject_css():
         color: #C5A258 !important;
         fill: #C5A258 !important;
     }
+    /* Sidebar restaurant quick-nav */
+    [data-testid="stSidebar"] [data-testid="stExpander"] {
+        background: transparent !important;
+        border: none !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary {
+        color: #FFFFFF !important;
+        font-size: 0.85rem !important;
+        font-weight: 500 !important;
+        padding: 0.25rem 0 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary span {
+        color: #FFFFFF !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stExpander"] summary svg {
+        color: #C5A258 !important;
+    }
+    [data-testid="stSidebar"] [class*="st-key-sidebar_"] button {
+        background: none !important;
+        border: none !important;
+        color: rgba(255,255,255,0.7) !important;
+        font-size: 0.8rem !important;
+        font-weight: 400 !important;
+        padding: 0.15rem 0 !important;
+        min-height: 0 !important;
+        text-align: left !important;
+        justify-content: flex-start !important;
+    }
+    [data-testid="stSidebar"] [class*="st-key-sidebar_"] button:hover {
+        color: #C5A258 !important;
+        background: none !important;
+    }
+
     /* Sidebar title via ::before on nav */
     [data-testid="stSidebarNav"]::before {
         content: "MANAGEMENT TOOLS";

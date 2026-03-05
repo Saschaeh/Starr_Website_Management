@@ -44,4 +44,18 @@ dashboard = st.Page("pages/1_Dashboard.py", title="Restaurants", icon=":material
 batch = st.Page("pages/2_Batch.py", title="Batch Ops", icon=":material/bolt:")
 
 pg = st.navigation([dashboard, batch])
+
+# --- Sidebar restaurant quick-nav ---
+from src.db import get_all_restaurants
+from src.restaurant_registry import display_name
+
+with st.sidebar:
+    with st.expander("Restaurants", expanded=False, icon=":material/add:"):
+        for r in get_all_restaurants():
+            name = r['name']
+            dname = r.get('display_name') or display_name(name)
+            if st.button(dname, key=f"sidebar_{name}"):
+                st.session_state['selected_restaurant'] = name
+                st.rerun()
+
 pg.run()
