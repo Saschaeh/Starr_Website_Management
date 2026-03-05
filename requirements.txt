@@ -9,4 +9,4 @@ python-dotenv>=1.0.0
 pillow>=10.0.0
 numpy>=1.24.0
 huggingface_hub>=0.20.0
-# libsql-experimental>=0.0.40  # Only needed for Turso production mode; requires Rust to build
+libsql-experimental>=0.0.40  # Turso production mode (builds on Linux/Streamlit Cloud)
