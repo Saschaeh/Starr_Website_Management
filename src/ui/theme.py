@@ -158,7 +158,8 @@ def inject_css():
     }
     /* Sidebar nav links — high contrast */
     [data-testid="stSidebar"] [data-testid="stSidebarNav"] {
-        padding-top: 0.5rem;
+        padding-top: 0 !important;
+        margin-top: 0 !important;
     }
     [data-testid="stSidebar"] [data-testid="stSidebarNav"] a {
         color: #FFFFFF !important;
@@ -201,12 +202,20 @@ def inject_css():
         font-weight: 600;
         letter-spacing: 0.15em;
         text-transform: uppercase;
-        padding: 0.75rem 1rem 0.25rem 1rem;
+        padding: 0.5rem 1rem 0;
         margin: 0;
     }
     .sidebar-title-wrapper {
         margin: 0 !important;
         padding: 0 !important;
+    }
+    /* Kill all gaps between sidebar children */
+    [data-testid="stSidebar"] > div:first-child > * {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stSidebarNav"] ul {
+        padding-top: 0 !important;
     }
 
     /* === PROGRESS PILLS === */
