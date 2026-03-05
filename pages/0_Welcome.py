@@ -9,6 +9,12 @@ n_restaurants = len(restaurants)
 n_menus = len(list_menus())
 n_images = sum(len(get_images_for_restaurant(r['name'])) for r in restaurants)
 n_copy = sum(1 for r in restaurants if get_copy_for_restaurant(r['name']))
+n_booking = sum(1 for r in restaurants if r.get('opentable_rid') or r.get('resy_url'))
+n_tripleseat = sum(1 for r in restaurants if r.get('tripleseat_form_id'))
+n_onetrust = sum(1 for r in restaurants if r.get('onetrust_id'))
+
+# Hide the top Starr header on the Welcome page to avoid double header
+st.markdown("""<style>.starr-header { display: none !important; }</style>""", unsafe_allow_html=True)
 
 # --- Hero ---
 st.markdown(f"""
@@ -50,8 +56,7 @@ st.markdown(f"""
         max-width: 640px;
     ">
         Your central platform for managing website content, images, menus,
-        and brand assets across the entire Starr Restaurant Group portfolio
-        — all from one place.
+        and brand assets across the entire Starr Restaurant Group portfolio.
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -90,6 +95,16 @@ with c3:
     st.markdown(_stat_style.format(value=n_images, label="Images Managed"), unsafe_allow_html=True)
 with c4:
     st.markdown(_stat_style.format(value=n_copy, label="Copy Sets"), unsafe_allow_html=True)
+
+st.markdown("<div style='height: 0.75rem'></div>", unsafe_allow_html=True)
+
+c5, c6, c7, _sp = st.columns(4)
+with c5:
+    st.markdown(_stat_style.format(value=n_booking, label="Booking IDs"), unsafe_allow_html=True)
+with c6:
+    st.markdown(_stat_style.format(value=n_tripleseat, label="Tripleseat IDs"), unsafe_allow_html=True)
+with c7:
+    st.markdown(_stat_style.format(value=n_onetrust, label="OneTrust IDs"), unsafe_allow_html=True)
 
 st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
 
@@ -131,8 +146,8 @@ with f1:
         icon="&#128444;",
         title="Image Pipeline",
         desc="Upload once, automatically resize to every format your websites need. "
-             "Alt text generated for accessibility compliance. "
-             "Brand-aware processing — automatic B&W conversion for Chef's Table."
+             "Consistent file naming conventions across all restaurants. "
+             "Brand-aware processing — automatic B&W conversion for chef photos."
     ), unsafe_allow_html=True)
 
 with f2:
@@ -160,11 +175,11 @@ f4, f5 = st.columns(2)
 
 with f4:
     st.markdown(_feature_card.format(
-        icon="&#127912;",
-        title="Brand Detection",
-        desc="Automatically pulls primary colors, booking platforms, social links, "
-             "contact details, and reservation IDs from your existing websites. "
-             "No manual data entry required."
+        icon="&#9855;",
+        title="ADA Compliance",
+        desc="Every image gets a descriptive alt tag for screen readers. "
+             "Standardised file naming ensures consistency across all restaurants. "
+             "Stay compliant with accessibility requirements without the manual work."
     ), unsafe_allow_html=True)
 
 with f5:
