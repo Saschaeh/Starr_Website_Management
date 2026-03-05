@@ -50,6 +50,54 @@ def _fmt_date(iso_str):
         return ""
 
 
+# Staging URL mapping (slug -> kinsta subdomain)
+_STAGING_URLS = {
+    "makoto": "stg-makoto",
+    "lecafe-menu": "stg-lecafelouisvuitton",
+    "slims": "stg-slims",
+    "upland": "stg-upland",
+    "babbo": "stg-babbo",
+    "barclay-prime": "stg-barclayprime",
+    "borromini-new": "stg-borromini",
+    "buddakan-nyc": "stg-buddakannewyor",
+    "buddakan-pa": "stg-buddakanphiladelphia",
+    "butcher-and-singer": "stg-butcherandsinger",
+    "the-continental-mid-town": "stg-continentalmidtown",
+    "el-presidente": "stg-elpresidente",
+    "el-rey": "stg-elreyd",
+    "el-vez-ft-lauderdale": "stg-elvezftlauderdale",
+    "el-vez-nyc": "stg-elveznewyork",
+    "el-vez-philadelphia": "stg-elvezphiladelphia",
+    "electric-lemon": "stg-electriclemon",
+    "fette-sau": "stg-fettesau",
+    "frankford-hall": "stg-frankfordhall",
+    "le-coucou": "stg-lecoucou",
+    "le-diplomate": "stg-lediplomate",
+    "lmno": "stg-lmnophilly",
+    "morimoto": "stg-morimotophiladelphia",
+    "osteria-mozza": "stg-osteriamozza",
+    "parc": "stg-parcrestaurant",
+    "pastis-nyc": "stg-pastisnewyork",
+    "pastis-dc": "stg-pastisdc",
+    "pastis-miami": "stg-pastismiami",
+    "pastis-nashville": "stg-pastisnashville",
+    "pizzeria-stella": "stg-pizzeriastella",
+    "st-anselm": "stg-stanselm",
+    "steak-954": "stg-steak954",
+    "talulas-garden": "stg-talulasgarden",
+    "talulas-daily": "stg-talulasdaily",
+    "the-clocktower": "stg-theclocktower",
+    "the-dandelion": "stg-thedandelion",
+    "the-love": "stg-thelove",
+    "the-occidental": "stg-theoccidental",
+}
+
+def _staging_url(slug):
+    sub = _STAGING_URLS.get(slug)
+    if sub:
+        return f"https://{sub}-staging.kinsta.cloud"
+    return ""
+
 # ═══════════════════════════════════════════════════════════════════════════
 # LIST VIEW — Full-width restaurant table (Kinsta-style)
 # ═══════════════════════════════════════════════════════════════════════════
@@ -206,8 +254,9 @@ def _show_list_view():
                         st.session_state['selected_restaurant'] = slug
                         st.rerun()
                 with nc2:
-                    stg_url = f"https://stg-{slug}-staging.kinsta.cloud"
-                    st.markdown(f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>', unsafe_allow_html=True)
+                    stg_url = _staging_url(slug)
+                    if stg_url:
+                        st.markdown(f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>', unsafe_allow_html=True)
             # Menu
             with cols[2]:
                 if has_menu:
@@ -351,8 +400,9 @@ def _show_detail_view(slug):
     # Restaurant header
     hc1, hc2 = st.columns([3, 1])
     with hc1:
-        stg_url = f"https://stg-{slug}-staging.kinsta.cloud"
-        link_html = f' <a href="{stg_url}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>'
+        stg_url = _staging_url(slug)
+        link_html = f' <a href="{stg_url}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>' if stg_url else ''
+'
         st.markdown(
             f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
             f'font-weight:600;margin:0;">{dname}{link_html}</h1>'
