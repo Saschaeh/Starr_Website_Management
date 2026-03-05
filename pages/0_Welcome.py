@@ -2,18 +2,21 @@
 
 import streamlit as st
 st.session_state.pop('_on_restaurants_page', None)
-from src.db import get_all_restaurants, list_menus, get_images_for_restaurant, get_copy_for_restaurant
+from src.db import get_all_restaurants, list_menus, get_all_image_counts, get_all_copy_counts
 
 # --- Gather live stats ---
-restaurants = get_all_restaurants()
-n_restaurants = len(restaurants)
-n_menus = len(list_menus())
-n_images = sum(len(get_images_for_restaurant(r['name'])) for r in restaurants)
-n_copy = sum(1 for r in restaurants if get_copy_for_restaurant(r['name']))
-n_booking = sum(1 for r in restaurants if r.get('opentable_rid') or r.get('resy_url'))
-n_tripleseat = sum(1 for r in restaurants if r.get('tripleseat_form_id'))
-n_onetrust = sum(1 for r in restaurants if r.get('onetrust_id'))
-n_wordfence = sum(1 for r in restaurants if r.get('wordfence_api_key'))
+with st.spinner("Loading portfolio data..."):
+    restaurants = get_all_restaurants()
+    n_restaurants = len(restaurants)
+    n_menus = len(list_menus())
+    img_counts, chef_counts = get_all_image_counts()
+    copy_counts = get_all_copy_counts()
+    n_images = sum(img_counts.values()) + sum(chef_counts.values())
+    n_copy = sum(1 for v in copy_counts.values() if v > 0)
+    n_booking = sum(1 for r in restaurants if r.get('opentable_rid') or r.get('resy_url'))
+    n_tripleseat = sum(1 for r in restaurants if r.get('tripleseat_form_id'))
+    n_onetrust = sum(1 for r in restaurants if r.get('onetrust_id'))
+    n_wordfence = sum(1 for r in restaurants if r.get('wordfence_api_key'))
 
 # Hide the top Starr header on the Welcome page to avoid double header
 st.markdown("""<style>.starr-header { display: none !important; }</style>""", unsafe_allow_html=True)
