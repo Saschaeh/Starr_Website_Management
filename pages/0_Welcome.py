@@ -167,8 +167,7 @@ with f3:
         icon="&#127860;",
         title="Menu Management",
         desc="Convert Word document menus into structured, website-ready HTML. "
-             "Handles multi-section layouts, dietary markers, and price formatting "
-             "across your entire portfolio."
+             "Handles multi-section layouts, dietary markers, and price formatting."
     ), unsafe_allow_html=True)
 
 st.markdown("<div style='height: 1.5rem'></div>", unsafe_allow_html=True)
@@ -181,8 +180,7 @@ with f4:
         icon="&#9855;",
         title="ADA Compliance",
         desc="Every image gets a descriptive alt tag for screen readers. "
-             "Standardised file naming ensures consistency across all restaurants. "
-             "Stay compliant with accessibility requirements without the manual work."
+             "Standardised file naming ensures consistency across all restaurants."
     ), unsafe_allow_html=True)
 
 with f5:
