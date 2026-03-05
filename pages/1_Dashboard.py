@@ -1283,4 +1283,6 @@ def run():
     else:
         _show_list_view()
 
-run()
+# Guard: skip auto-run when imported by another page (e.g. 3_Restaurants.py)
+if not st.session_state.get('_importing_dashboard'):
+    run()
