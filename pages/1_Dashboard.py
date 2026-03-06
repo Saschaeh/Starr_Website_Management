@@ -209,7 +209,7 @@ def _show_list_view():
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
-    _COL_W = [0.3, 1.4, 0.6, 0.9, 0.6, 0.55, 0.5, 0.5, 0.6, 1.6]
+    _COL_W = [0.3, 1.4, 0.6, 0.7, 0.6, 0.55, 0.5, 0.5, 0.6, 1.6]
     _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Notes"]
     cols_h = st.columns(_COL_W)
     for col, label in zip(cols_h, _COL_LABELS):
