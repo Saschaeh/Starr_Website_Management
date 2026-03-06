@@ -209,8 +209,8 @@ def _show_list_view():
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
-    _COL_W = [0.3, 2.0, 0.6, 0.7, 0.5, 0.6, 0.55, 0.5, 0.5, 0.6, 0.5]
-    _COL_LABELS = ["", "Name", "Menu", "Images", "Chef", "Copy", "Brand", "IDs", "Links", "Contact", "Synced"]
+    _COL_W = [0.3, 1.4, 0.6, 0.9, 0.6, 0.55, 0.5, 0.5, 0.6, 1.6]
+    _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Notes"]
     cols_h = st.columns(_COL_W)
     for col, label in zip(cols_h, _COL_LABELS):
         with col:
@@ -241,6 +241,7 @@ def _show_list_view():
             chc = chef_counts.get(slug, 0)
             cc = copy_counts.get(slug, 0)
 
+            notes = r.get('notes') or ''
             cols = st.columns(_COL_W)
             # Checkbox
             with cols[0]:
@@ -263,44 +264,46 @@ def _show_list_view():
                     st.markdown(_check, unsafe_allow_html=True)
                 else:
                     st.markdown(_x_red, unsafe_allow_html=True)
-            # Images (x/9)
+            # Images (x/9 x/3)
             with cols[3]:
+                parts = []
                 if ic > 0:
-                    st.markdown(_pill_html("", ic, 9), unsafe_allow_html=True)
-                else:
-                    st.markdown(_dash, unsafe_allow_html=True)
-            # Chef (x/3)
-            with cols[4]:
+                    parts.append(_pill_html("", ic, 9))
                 if chc > 0:
-                    st.markdown(_pill_html("", chc, 3), unsafe_allow_html=True)
-                else:
-                    st.markdown(_dash, unsafe_allow_html=True)
+                    parts.append(_pill_html("", chc, 3))
+                st.markdown(' '.join(parts) if parts else _dash, unsafe_allow_html=True)
             # Copy
-            with cols[5]:
+            with cols[4]:
                 if cc > 0:
                     st.markdown(_pill_html("", cc, 5), unsafe_allow_html=True)
                 else:
                     st.markdown(_dash, unsafe_allow_html=True)
             # Brand
-            with cols[6]:
+            with cols[5]:
                 st.markdown(_check if brand_ok.get(slug) else _dash,
                             unsafe_allow_html=True)
             # IDs
-            with cols[7]:
+            with cols[6]:
                 st.markdown(_check if ids_ok.get(slug) else _x_red,
                             unsafe_allow_html=True)
             # Links
-            with cols[8]:
+            with cols[7]:
                 st.markdown(_check if links_ok.get(slug) else _x_orange,
                             unsafe_allow_html=True)
             # Contact
-            with cols[9]:
+            with cols[8]:
                 st.markdown(_check if contact_ok.get(slug) else _x_orange,
                             unsafe_allow_html=True)
-            # Synced
-            with cols[10]:
-                st.markdown(_sync_live if r.get('pull_data') else _sync_pending,
-                            unsafe_allow_html=True)
+            # Notes
+            with cols[9]:
+                if notes:
+                    st.markdown(
+                        f'<span style="font-size:0.75rem;color:#6B7280;white-space:nowrap;'
+                        f'overflow:hidden;text-overflow:ellipsis;display:block;max-width:100%;"'
+                        f' title="{notes}">{notes}</span>',
+                        unsafe_allow_html=True)
+                else:
+                    st.markdown(_dash, unsafe_allow_html=True)
 
     # --- Handle Edit / Delete actions ---
     selected_slugs = [r['name'] for r in filtered
