@@ -98,51 +98,127 @@ if st.button("Generate Missing Copy", type="primary", key="batch_copy"):
     st.success(f"Generated copy for {generated} restaurants.")
 
 
-# --- Batch Brand Detection ---
-st.markdown("---")
-st.markdown("### Batch Brand Detection")
-st.markdown("Auto-detect brand data (color, booking, social, contact) for all restaurants.")
-
-if st.button("Detect Missing Brand Data", type="primary", key="batch_brand"):
+# shared batch detect helper
+def _batch_detect(keys, label, download_images=False):
     from src.cms.brand_detector import scrape_website
 
+    with_url = [r for r in restaurants if r.get('website_url')]
     progress = st.progress(0)
-    total = len([r for r in restaurants if r.get('website_url')])
     updated = 0
+    details = []
 
-    for i, r in enumerate(restaurants):
+    for i, r in enumerate(with_url):
         slug = r['name']
-        url = r.get('website_url', '')
-        if not url:
-            continue
-
-        progress.progress((i + 1) / total,
-                          text=f"Detecting {display_name(slug)}...")
+        url = r['website_url']
+        dname = r.get('display_name') or display_name(slug)
+        progress.progress((i + 1) / len(with_url), text=f"Detecting {dname}...")
 
         ok, text, error, detected = scrape_website(url)
-        if ok and detected:
-            fields = {}
-            for k in ('primary_color', 'opentable_rid', 'resy_url',
-                      'tripleseat_form_id', 'mailing_list_url',
-                      'order_online_url', 'facebook_url', 'instagram_url',
-                      'spotify_url', 'linkedin_url', 'phone',
-                      'email_general', 'email_events', 'email_marketing',
-                      'email_press', 'address', 'google_maps_url',
-                      'opening_hours'):
-                detected_key = k if k != 'booking_platform' else 'booking'
-                val = detected.get(detected_key, '')
-                if val and not r.get(k):
-                    fields[k] = val
-            if detected.get('booking') and not r.get('booking_platform'):
-                fields['booking_platform'] = detected['booking']
-            # Auto-detect city from address
+        if not ok or not detected:
+            continue
+
+        fields = {}
+        saved_extras = []
+
+        for k in keys:
+            if k == 'booking_platform':
+                val = detected.get('booking', '')
+            else:
+                val = detected.get(k, '')
+            if val and not r.get(k):
+                fields[k] = val
+
+        if 'address' in keys:
             addr_val = detected.get('address', '') or fields.get('address', '')
             if addr_val:
                 detected_city = city_from_address(addr_val)
                 if detected_city and not r.get('city'):
                     fields['city'] = detected_city
-            if fields:
-                db.update_restaurant(slug, **fields)
-                updated += 1
 
-    st.success(f"Updated brand data for {updated} restaurants.")
+        if download_images:
+            import requests as _req
+            _hdrs = {'User-Agent': 'Mozilla/5.0'}
+            if detected.get('logo_url') and not db.get_image_data(slug, 'Logo'):
+                try:
+                    _r = _req.get(detected['logo_url'], timeout=10, headers=_hdrs)
+                    if _r.ok and len(_r.content) > 100:
+                        db.save_image(slug, 'Logo', _r.content,
+                                      detected['logo_url'].split('/')[-1].split('?')[0])
+                        saved_extras.append('Logo')
+                except Exception:
+                    pass
+            if detected.get('favicon_url') and not db.get_image_data(slug, 'Favicon'):
+                try:
+                    _r = _req.get(detected['favicon_url'], timeout=10, headers=_hdrs)
+                    if _r.ok and len(_r.content) > 100:
+                        db.save_image(slug, 'Favicon', _r.content,
+                                      detected['favicon_url'].split('/')[-1].split('?')[0])
+                        saved_extras.append('Favicon')
+                except Exception:
+                    pass
+
+        if fields:
+            db.update_restaurant(slug, **fields)
+            updated += 1
+            all_keys = list(fields.keys()) + saved_extras
+            details.append(f"**{dname}**: {', '.join(all_keys)}")
+        elif saved_extras:
+            updated += 1
+            details.append(f"**{dname}**: {', '.join(saved_extras)}")
+
+    progress.empty()
+    st.success(f"{label}: updated {updated}/{len(with_url)} restaurants.")
+    for d in details:
+        st.markdown(d)
+
+
+# --- Batch Brand Detection ---
+st.markdown("---")
+st.markdown("### Batch Brand Detection")
+st.markdown("Detect primary color, logo, and site icon for all restaurants.")
+
+if st.button("Detect Missing Brand Data", type="primary", key="batch_brand"):
+    _batch_detect(
+        keys=['primary_color', 'booking_platform'],
+        label="Brand",
+        download_images=True,
+    )
+
+
+# --- Batch IDs Detection ---
+st.markdown("---")
+st.markdown("### Batch IDs Detection")
+st.markdown("Detect OpenTable, Resy, Tripleseat, and Order Online for all restaurants.")
+
+if st.button("Detect Missing IDs", type="primary", key="batch_ids"):
+    _batch_detect(
+        keys=['booking_platform', 'opentable_rid', 'resy_url',
+              'tripleseat_form_id', 'order_online_url'],
+        label="IDs",
+    )
+
+
+# --- Batch Links Detection ---
+st.markdown("---")
+st.markdown("### Batch Links Detection")
+st.markdown("Detect mailing list, social media, and other links for all restaurants.")
+
+if st.button("Detect Missing Links", type="primary", key="batch_links"):
+    _batch_detect(
+        keys=['mailing_list_url', 'facebook_url', 'instagram_url',
+              'spotify_url', 'linkedin_url'],
+        label="Links",
+    )
+
+
+# --- Batch Contact Detection ---
+st.markdown("---")
+st.markdown("### Batch Contact Detection")
+st.markdown("Detect phone, emails, address, opening hours, and Google Maps for all restaurants.")
+
+if st.button("Detect Missing Contact Info", type="primary", key="batch_contact"):
+    _batch_detect(
+        keys=['phone', 'email_general', 'email_events', 'email_marketing',
+              'email_press', 'address', 'google_maps_url', 'opening_hours'],
+        label="Contact",
+    )
