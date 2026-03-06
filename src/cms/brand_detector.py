@@ -320,24 +320,50 @@ def _detect_site_metadata(html_bytes):
     # Opening hours
     _day_re = re.compile(r"(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)", re.IGNORECASE)
     _time_re = re.compile(r"\d{1,2}(?::\d{2})?\s*(?:am|pm)", re.IGNORECASE)
-    for tag in soup.find_all(["p", "li", "span"]):
-        inner_html = str(tag)
-        plain = re.sub(r"<[^>]+>", "", inner_html)
-        if len(plain) > 500 or len(plain) < 10:
-            continue
-        if _day_re.search(plain) and _time_re.search(plain):
-            parts = re.split(r"<br\s*/?>", inner_html, flags=re.IGNORECASE)
-            lines = [re.sub(r"<[^>]+>", "", p).strip() for p in parts]
-            lines = [ln for ln in lines if ln]
-            # Normalise each line: en-dash between days/times, 12h format
-            cleaned = []
-            for ln in lines:
-                # Replace various dashes with en-dash for day ranges and time ranges
-                ln = re.sub(r"(?<=\w)\s*[-–—]\s*(?=\w)", chr(8211), ln)
-                cleaned.append(ln)
-            sep = chr(92) + "n"  # literal backslash-n
-            result["opening_hours"] = sep.join(cleaned)
+    sep = chr(92) + "n"  # literal backslash-n
+
+    def _normalize_hours_line(ln):
+        ln = re.sub(r"(?<=\w)\s*[-–—]\s*(?=\w)", chr(8211), ln)
+        return ln.strip()
+
+    def _is_hours_line(ln):
+        return bool(_day_re.search(ln) and _time_re.search(ln))
+
+    # Pass 1: single tag with <br> separated lines (prefer p/li/span over div)
+    for tag_types in (["p", "li", "span"], ["div"]):
+        if result["opening_hours"]:
             break
+        for tag in soup.find_all(tag_types):
+            inner_html = str(tag)
+            plain = re.sub(r"<[^>]+>", " ", inner_html).strip()
+            if len(plain) > 500 or len(plain) < 10:
+                continue
+            if _day_re.search(plain) and _time_re.search(plain):
+                parts = re.split(r"<br\s*/?>", inner_html, flags=re.IGNORECASE)
+                lines = [re.sub(r"<[^>]+>", "", p).strip() for p in parts]
+                lines = [ln for ln in lines if ln and len(ln) < 80 and _is_hours_line(ln)]
+                if len(lines) >= 2:
+                    cleaned = [_normalize_hours_line(ln) for ln in lines]
+                    result["opening_hours"] = sep.join(cleaned)
+                    break
+
+    # Pass 2: sibling tags each containing a day (e.g. separate <p> per line)
+    if not result["opening_hours"]:
+        for tag in soup.find_all(["p", "li", "span", "div", "dt", "dd"]):
+            txt = tag.get_text(strip=True)
+            if len(txt) > 200 or len(txt) < 5:
+                continue
+            if _is_hours_line(txt):
+                collected = [_normalize_hours_line(txt)]
+                for sib in tag.find_next_siblings(tag.name):
+                    sib_txt = sib.get_text(strip=True)
+                    if _is_hours_line(sib_txt):
+                        collected.append(_normalize_hours_line(sib_txt))
+                    else:
+                        break
+                if len(collected) >= 2:
+                    result["opening_hours"] = sep.join(collected)
+                    break
 
     return result
 

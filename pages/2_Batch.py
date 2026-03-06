@@ -123,6 +123,7 @@ def _batch_detect(keys, label, download_images=False):
 
         fields = {}
         saved_extras = []
+        skipped = []
 
         for k in keys:
             if k == 'booking_platform':
@@ -131,6 +132,8 @@ def _batch_detect(keys, label, download_images=False):
                 val = detected.get(k, '')
             if val and not r.get(k):
                 fields[k] = val
+            elif val and r.get(k):
+                skipped.append(k)
 
         if 'address' in keys:
             addr_val = detected.get('address', '') or fields.get('address', '')
@@ -162,13 +165,18 @@ def _batch_detect(keys, label, download_images=False):
                     pass
 
         if fields:
-            db.update_restaurant(slug, **fields)
-            updated += 1
-            all_keys = list(fields.keys()) + saved_extras
-            details.append(f"**{dname}**: {', '.join(all_keys)}")
+            try:
+                db.update_restaurant(slug, **fields)
+                updated += 1
+                all_keys = list(fields.keys()) + saved_extras
+                details.append(f"**{dname}**: {', '.join(all_keys)}")
+            except Exception as e:
+                details.append(f"~~{dname}~~: DB error ({e})")
         elif saved_extras:
             updated += 1
             details.append(f"**{dname}**: {', '.join(saved_extras)}")
+        elif skipped:
+            details.append(f"{dname}: already has {', '.join(skipped)}")
 
     progress.empty()
     st.success(f"{label}: updated {updated}/{len(with_url)} restaurants.")
