@@ -890,7 +890,9 @@ def _render_images_tab(slug, dname):
                 "Upload image", type=['jpg', 'jpeg', 'png', 'webp'],
                 key=f"iu_{slug}_{fn}", label_visibility="collapsed")
 
-            if up:
+            # Track processed uploads to avoid rerun loop
+            upload_done_key = f'_img_done_{slug}_{fn}'
+            if up and not st.session_state.get(upload_done_key):
                 pil = fix_exif_orientation(Image.open(up))
                 if pil.mode in ('RGBA', 'LA', 'PA', 'P'):
                     pil = pil.convert('RGB')
@@ -903,8 +905,11 @@ def _render_images_tab(slug, dname):
                 with st.spinner("Generating alt text..."):
                     at = generate_alt_text(pil) or ''
                 db.save_image(slug, fn, buf.getvalue(), up.name, at)
+                st.session_state[upload_done_key] = True
                 st.success(f"Saved {header.split('(')[0].strip()}!")
                 st.rerun()
+            elif not up:
+                st.session_state.pop(upload_done_key, None)
 
             # Remaining controls for existing images
             if has and idata:
@@ -1153,9 +1158,13 @@ def _render_brand_tab(slug, r_data, dname):
         with st.expander("Replace logo" if ld else "Add logo"):
             ul = st.file_uploader("Upload file", type=["jpg", "jpeg", "png", "svg", "webp", "gif"],
                                   key=f"bl_{slug}", label_visibility="collapsed")
-            if ul:
+            logo_done_key = f'_img_done_{slug}_Logo'
+            if ul and not st.session_state.get(logo_done_key):
                 db.save_image(slug, "Logo", ul.read(), ul.name)
+                st.session_state[logo_done_key] = True
                 st.rerun()
+            elif not ul:
+                st.session_state.pop(logo_done_key, None)
 
     with col_favicon:
         st.markdown("**Site Icon**")
@@ -1170,9 +1179,13 @@ def _render_brand_tab(slug, r_data, dname):
         with st.expander("Replace icon" if fd else "Add icon"):
             uf = st.file_uploader("Upload file", type=["jpg", "jpeg", "png", "ico", "svg", "webp"],
                                   key=f"bf_{slug}", label_visibility="collapsed")
-            if uf:
+            fav_done_key = f'_img_done_{slug}_Favicon'
+            if uf and not st.session_state.get(fav_done_key):
                 db.save_image(slug, "Favicon", uf.read(), uf.name)
+                st.session_state[fav_done_key] = True
                 st.rerun()
+            elif not uf:
+                st.session_state.pop(fav_done_key, None)
 
     with col_color:
         st.markdown("**Primary Color**")
@@ -1255,6 +1268,8 @@ def _render_reservations_tab(slug, r_data, dname):
     if booking_val:
         st.caption(f"Detected platform: **{booking_val}**")
 
+    # ── Reservations ──────────────────────────────────────────────────
+    st.markdown("#### Reservations")
     col_ot, col_resy = st.columns(2)
     with col_ot:
         ot = st.text_input("OpenTable RID", value=r_data.get('opentable_rid', ''),
@@ -1265,27 +1280,26 @@ def _render_reservations_tab(slug, r_data, dname):
                            key=f"brs_{slug}", placeholder="https://resy.com/cities/...",
                            help="Full Resy venue URL.")
 
-    col_ts, col_ot_id = st.columns(2)
-    with col_ts:
-        ts = st.text_input("Tripleseat Form ID", value=r_data.get('tripleseat_form_id', ''),
-                           key=f"bts_{slug}", placeholder="e.g. 6616",
-                           help="Numeric lead_form_id from Tripleseat.")
-        if not r_data.get('tripleseat_form_id'):
-            st.caption(":gray[No group bookings / TripleSeat detected]")
+    ts = st.text_input("Tripleseat Form ID", value=r_data.get('tripleseat_form_id', ''),
+                       key=f"bts_{slug}", placeholder="e.g. 6616",
+                       help="Numeric lead_form_id from Tripleseat.")
+    if not r_data.get('tripleseat_form_id'):
+        st.caption(":gray[No group bookings / TripleSeat detected]")
+
+    # ── Legal, Security & Data ────────────────────────────────────────
+    st.markdown("#### Legal, Security & Data")
+    col_ot_id, col_wf = st.columns(2)
     with col_ot_id:
         onetrust = st.text_input("OneTrust ID", value=r_data.get('onetrust_id', ''),
                                  key=f"bont_{slug}", placeholder="e.g. 01234567-abcd-...",
                                  help="OneTrust cookie consent domain script ID.")
-
-    col_wf, col_gtm = st.columns(2)
     with col_wf:
         wordfence = st.text_input("Wordfence API Key", value=r_data.get('wordfence_api_key', ''),
                                   key=f"bwf_{slug}", placeholder="e.g. abc123def456...",
                                   help="Wordfence security plugin license key.")
-    with col_gtm:
-        gtm = st.text_input("GTM ID", value=r_data.get('gtm_id', ''),
-                             key=f"bgtm_{slug}", placeholder="e.g. GTM-XXXXXXX",
-                             help="Google Tag Manager container ID.")
+    gtm = st.text_input("GTM ID", value=r_data.get('gtm_id', ''),
+                         key=f"bgtm_{slug}", placeholder="e.g. GTM-XXXXXXX",
+                         help="Google Tag Manager container ID.")
 
     st.markdown("---")
     dc1, dc2 = st.columns([1, 1], gap="small")
