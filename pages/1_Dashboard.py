@@ -259,12 +259,13 @@ def _show_list_view():
                     if st.button(dname, key=f"row_{slug}"):
                         st.session_state['selected_restaurant'] = slug
                         st.rerun()
-                    if slug in _NON_STANDARD_TEMPLATE:
-                        st.markdown('<span style="font-size:0.55rem;padding:1px 5px;border-radius:3px;background:#FECACA;color:#991B1B;font-weight:600;margin-top:-12px;display:inline-block;">CUSTOM TEMPLATE</span>', unsafe_allow_html=True)
                 with nc2:
                     stg_url = _staging_url(slug)
+                    _ns_icon = ' <span title="Custom template" style="color:#EF4444;">&#9889;</span>' if slug in _NON_STANDARD_TEMPLATE else ''
                     if stg_url:
-                        st.markdown(f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>', unsafe_allow_html=True)
+                        st.markdown(f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>{_ns_icon}', unsafe_allow_html=True)
+                    elif _ns_icon:
+                        st.markdown(_ns_icon, unsafe_allow_html=True)
             # Menu
             with cols[2]:
                 if has_menu:
