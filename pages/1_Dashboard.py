@@ -1429,8 +1429,11 @@ def _render_contact_tab(slug, r_data, dname):
         ph_val = st.text_input("Phone", value=r_data.get('phone', ''), key=f"bph_{slug}")
         addr = st.text_input("Address", value=r_data.get('address', ''), key=f"bad_{slug}")
         gm = st.text_input("Google Maps", value=r_data.get('google_maps_url', ''), key=f"bgm_{slug}")
-        hrs = st.text_area("Opening Hours", value=r_data.get('opening_hours', ''),
-                           key=f"bhrs_{slug}", height=100)
+        _hrs_stored = r_data.get('opening_hours', '')
+        _hrs_display = _hrs_stored.replace(chr(92) + "n", chr(10)) if _hrs_stored else ""
+        _hrs_edited = st.text_area("Opening Hours", value=_hrs_display,
+                                   key=f"bhrs_{slug}", height=100)
+        hrs = _hrs_edited.replace(chr(10), chr(92) + "n").strip() if _hrs_edited else ""
     with c2:
         eg = st.text_input("Email (General)", value=r_data.get('email_general', ''), key=f"beg_{slug}")
         ee = st.text_input("Email (Events)", value=r_data.get('email_events', ''), key=f"bee_{slug}")

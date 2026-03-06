@@ -329,8 +329,14 @@ def _detect_site_metadata(html_bytes):
             parts = re.split(r"<br\s*/?>", inner_html, flags=re.IGNORECASE)
             lines = [re.sub(r"<[^>]+>", "", p).strip() for p in parts]
             lines = [ln for ln in lines if ln]
-            nl = chr(10)
-            result["opening_hours"] = nl.join(lines)
+            # Normalise each line: en-dash between days/times, 12h format
+            cleaned = []
+            for ln in lines:
+                # Replace various dashes with en-dash for day ranges and time ranges
+                ln = re.sub(r"(?<=\w)\s*[-–—]\s*(?=\w)", chr(8211), ln)
+                cleaned.append(ln)
+            sep = chr(92) + "n"  # literal backslash-n
+            result["opening_hours"] = sep.join(cleaned)
             break
 
     return result
