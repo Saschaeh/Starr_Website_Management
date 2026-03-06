@@ -166,8 +166,8 @@ def _show_list_view():
 
     # --- Search + Filters + Actions row ---
     # Filter group                          gap    Manage group
-    fc1, fc2, fc3, _gap, fc4, fc5, fc6 = st.columns(
-        [2, 0.9, 0.9, 0.4, 0.7, 0.7, 0.7], vertical_alignment="bottom")
+    fc1, fc2, fc2b, fc3, _gap, fc4, fc5, fc6 = st.columns(
+        [2, 0.9, 0.8, 0.9, 0.3, 0.7, 0.7, 0.7], vertical_alignment="bottom")
     with fc1:
         search = st.text_input("Search", placeholder="Search restaurants...",
                                label_visibility="collapsed", key="ls")
@@ -177,6 +177,9 @@ def _show_list_view():
         if extras:
             city_opts += extras
         city_filter = st.selectbox("City", city_opts, label_visibility="collapsed", key="lc")
+    with fc2b:
+        tpl_opts = ["All Templates", "Standard", "Custom"]
+        tpl_filter = st.selectbox("Template", tpl_opts, label_visibility="collapsed", key="lt")
     with fc3:
         status_opts = ["All Status", "Complete", "In Progress", "Not Started"]
         status_filter = st.selectbox("Status", status_opts, label_visibility="collapsed",
@@ -198,6 +201,10 @@ def _show_list_view():
                     if q in (r.get('display_name') or '').lower() or q in r['name']]
     if city_filter != "All Cities":
         filtered = [r for r in filtered if (r.get('city') or get_city(r['name'])) == city_filter]
+    if tpl_filter == "Custom":
+        filtered = [r for r in filtered if r['name'] in _NON_STANDARD_TEMPLATE]
+    elif tpl_filter == "Standard":
+        filtered = [r for r in filtered if r['name'] not in _NON_STANDARD_TEMPLATE]
     if status_filter == "Complete":
         filtered = [r for r in filtered if _is_complete(r['name'])]
     elif status_filter == "In Progress":
@@ -261,11 +268,11 @@ def _show_list_view():
                         st.rerun()
                 with nc2:
                     stg_url = _staging_url(slug)
-                    _ns_icon = ' <span title="Custom template" style="color:#EF4444;">&#9889;</span>' if slug in _NON_STANDARD_TEMPLATE else ''
-                    if stg_url:
-                        st.markdown(f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>{_ns_icon}', unsafe_allow_html=True)
-                    elif _ns_icon:
-                        st.markdown(_ns_icon, unsafe_allow_html=True)
+                    _ns_icon = '<span title="Custom template" style="color:#EF4444;font-size:0.75rem;">&#9889;</span>' if slug in _NON_STANDARD_TEMPLATE else ''
+                    _link_icon = f'<a href="{stg_url}" target="_blank" style="font-size:0.75rem;color:#6B7280;text-decoration:none;">&#128279;</a>' if stg_url else ''
+                    _icons = f'{_link_icon}{_ns_icon}'
+                    if _icons:
+                        st.markdown(_icons, unsafe_allow_html=True)
             # Menu
             with cols[2]:
                 if has_menu:
