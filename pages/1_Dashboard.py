@@ -92,6 +92,11 @@ _STAGING_URLS = {
     "the-occidental": "stg-theoccidental",
 }
 
+# Restaurants with non-standard WordPress templates
+_NON_STANDARD_TEMPLATE = {
+    'lmno', 'lecafe-menu',
+}
+
 def _staging_url(slug):
     sub = _STAGING_URLS.get(slug)
     if sub:
@@ -251,9 +256,11 @@ def _show_list_view():
                 wurl = r.get('website_url', '')
                 nc1, nc2 = st.columns([4, 1])
                 with nc1:
-                    if st.button(f"{dname}", key=f"row_{slug}"):
+                    if st.button(dname, key=f"row_{slug}"):
                         st.session_state['selected_restaurant'] = slug
                         st.rerun()
+                    if slug in _NON_STANDARD_TEMPLATE:
+                        st.markdown('<span style="font-size:0.55rem;padding:1px 5px;border-radius:3px;background:#FECACA;color:#991B1B;font-weight:600;margin-top:-12px;display:inline-block;">CUSTOM TEMPLATE</span>', unsafe_allow_html=True)
                 with nc2:
                     stg_url = _staging_url(slug)
                     if stg_url:
