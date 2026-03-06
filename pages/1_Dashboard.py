@@ -1429,6 +1429,8 @@ def _render_contact_tab(slug, r_data, dname):
         ph_val = st.text_input("Phone", value=r_data.get('phone', ''), key=f"bph_{slug}")
         addr = st.text_input("Address", value=r_data.get('address', ''), key=f"bad_{slug}")
         gm = st.text_input("Google Maps", value=r_data.get('google_maps_url', ''), key=f"bgm_{slug}")
+        hrs = st.text_area("Opening Hours", value=r_data.get('opening_hours', ''),
+                           key=f"bhrs_{slug}", height=100)
     with c2:
         eg = st.text_input("Email (General)", value=r_data.get('email_general', ''), key=f"beg_{slug}")
         ee = st.text_input("Email (Events)", value=r_data.get('email_events', ''), key=f"bee_{slug}")
@@ -1440,7 +1442,7 @@ def _render_contact_tab(slug, r_data, dname):
     with bc1:
         if st.button("Save Contact Info", type="primary", key=f"bloc_save_{slug}"):
             db.update_restaurant(slug, phone=ph_val, address=addr, google_maps_url=gm,
-                                 email_general=eg, email_events=ee,
+                                 opening_hours=hrs, email_general=eg, email_events=ee,
                                  email_marketing=em, email_press=ep)
             st.success("Saved!")
             st.rerun()
@@ -1457,7 +1459,7 @@ def _render_contact_tab(slug, r_data, dname):
                     st.error(f"Could not scrape: {err}")
                 elif detected:
                     updates = {}
-                    for k in ('phone', 'address', 'google_maps_url',
+                    for k in ('phone', 'address', 'google_maps_url', 'opening_hours',
                               'email_general', 'email_events', 'email_marketing', 'email_press'):
                         if detected.get(k):
                             updates[k] = detected[k]

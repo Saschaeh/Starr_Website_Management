@@ -175,6 +175,7 @@ def init_db():
         ("menus", "menu_url", "TEXT DEFAULT ''"),
         ("restaurants", "spotify_url", "TEXT DEFAULT ''"),
         ("restaurants", "linkedin_url", "TEXT DEFAULT ''"),
+        ("restaurants", "opening_hours", "TEXT DEFAULT ''"),
     ]
     for table, col, col_def in _migrations:
         try:

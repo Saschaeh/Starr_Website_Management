@@ -202,6 +202,7 @@ def _detect_site_metadata(html_bytes):
         'order_online_url': '',
         'spotify_url': '',
         'linkedin_url': '',
+        'opening_hours': '',
     }
 
     # Booking platform
@@ -315,6 +316,22 @@ def _detect_site_metadata(html_bytes):
         addr_text = maps_link.get_text(separator=', ').strip()
         if addr_text:
             result['address'] = addr_text
+
+    # Opening hours
+    _day_re = re.compile(r"(?:monday|tuesday|wednesday|thursday|friday|saturday|sunday)", re.IGNORECASE)
+    _time_re = re.compile(r"\d{1,2}(?::\d{2})?\s*(?:am|pm)", re.IGNORECASE)
+    for tag in soup.find_all(["p", "li", "span"]):
+        inner_html = str(tag)
+        plain = re.sub(r"<[^>]+>", "", inner_html)
+        if len(plain) > 500 or len(plain) < 10:
+            continue
+        if _day_re.search(plain) and _time_re.search(plain):
+            parts = re.split(r"<br\s*/?>", inner_html, flags=re.IGNORECASE)
+            lines = [re.sub(r"<[^>]+>", "", p).strip() for p in parts]
+            lines = [ln for ln in lines if ln]
+            nl = chr(10)
+            result["opening_hours"] = nl.join(lines)
+            break
 
     return result
 
