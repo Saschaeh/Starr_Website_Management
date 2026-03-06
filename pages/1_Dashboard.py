@@ -281,12 +281,8 @@ def _show_list_view():
                     st.markdown(_x_red, unsafe_allow_html=True)
             # Images (x/9 x/3)
             with cols[3]:
-                parts = []
-                if ic > 0:
-                    parts.append(_pill_html("", ic, 9))
-                if chc > 0:
-                    parts.append(_pill_html("", chc, 3))
-                st.markdown(' '.join(parts) if parts else _dash, unsafe_allow_html=True)
+                parts = [_pill_html("", ic, 9), _pill_html("", chc, 3)]
+                st.markdown(' '.join(parts), unsafe_allow_html=True)
             # Copy
             with cols[4]:
                 if cc > 0:
