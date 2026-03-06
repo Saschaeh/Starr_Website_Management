@@ -124,10 +124,11 @@ if st.button("Detect Missing Brand Data", type="primary", key="batch_brand"):
             fields = {}
             for k in ('primary_color', 'opentable_rid', 'resy_url',
                       'tripleseat_form_id', 'mailing_list_url',
-                      'facebook_url', 'instagram_url', 'phone',
+                      'order_online_url', 'facebook_url', 'instagram_url',
+                      'spotify_url', 'linkedin_url', 'phone',
                       'email_general', 'email_events', 'email_marketing',
                       'email_press', 'address', 'google_maps_url',
-                      'order_online_url'):
+                      'opening_hours'):
                 detected_key = k if k != 'booking_platform' else 'booking'
                 val = detected.get(detected_key, '')
                 if val and not r.get(k):
