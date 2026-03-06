@@ -1280,11 +1280,17 @@ def _render_reservations_tab(slug, r_data, dname):
                            key=f"brs_{slug}", placeholder="https://resy.com/cities/...",
                            help="Full Resy venue URL.")
 
-    ts = st.text_input("Tripleseat Form ID", value=r_data.get('tripleseat_form_id', ''),
-                       key=f"bts_{slug}", placeholder="e.g. 6616",
-                       help="Numeric lead_form_id from Tripleseat.")
-    if not r_data.get('tripleseat_form_id'):
-        st.caption(":gray[No group bookings / TripleSeat detected]")
+    col_ts, col_oo = st.columns(2)
+    with col_ts:
+        ts = st.text_input("Tripleseat Form ID", value=r_data.get('tripleseat_form_id', ''),
+                           key=f"bts_{slug}", placeholder="e.g. 6616",
+                           help="Numeric lead_form_id from Tripleseat.")
+        if not r_data.get('tripleseat_form_id'):
+            st.caption(":gray[No group bookings / TripleSeat detected]")
+    with col_oo:
+        oo = st.text_input("Order Online URL", value=r_data.get('order_online_url', ''),
+                           key=f"boo_id_{slug}", placeholder="https://order.online/store/...",
+                           help="Third-party online ordering link.")
 
     # ── Legal, Security & Data ────────────────────────────────────────
     st.markdown("#### Legal, Security & Data")
@@ -1307,7 +1313,8 @@ def _render_reservations_tab(slug, r_data, dname):
         if st.button("Save IDs", type="primary", key=f"brs_save_{slug}"):
             db.update_restaurant(slug, booking_platform=booking_val,
                                  opentable_rid=ot, resy_url=rs,
-                                 tripleseat_form_id=ts, onetrust_id=onetrust,
+                                 tripleseat_form_id=ts, order_online_url=oo,
+                                 onetrust_id=onetrust,
                                  wordfence_api_key=wordfence, gtm_id=gtm)
             st.success("Saved!")
             st.rerun()
@@ -1374,15 +1381,13 @@ def _render_links_tab(slug, r_data, dname):
                            key=f"bml_{slug}", placeholder="https://signup.e2ma.net/...")
         fb = st.text_input("Facebook", value=r_data.get('facebook_url', ''), key=f"bfb_{slug}")
     with l2:
-        oo = st.text_input("Order Online URL", value=r_data.get('order_online_url', ''),
-                           key=f"boo_{slug}", placeholder="https://order.online/store/...")
         ig = st.text_input("Instagram", value=r_data.get('instagram_url', ''), key=f"big_{slug}")
 
     st.markdown("---")
     bc1, bc2 = st.columns([1, 1], gap="small")
     with bc1:
         if st.button("Save Links", type="primary", key=f"blnk_save_{slug}"):
-            db.update_restaurant(slug, mailing_list_url=ml, order_online_url=oo,
+            db.update_restaurant(slug, mailing_list_url=ml,
                                  facebook_url=fb, instagram_url=ig)
             st.success("Saved!")
             st.rerun()
