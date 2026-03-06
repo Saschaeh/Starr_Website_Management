@@ -890,9 +890,10 @@ def _render_images_tab(slug, dname):
                 "Upload image", type=['jpg', 'jpeg', 'png', 'webp'],
                 key=f"iu_{slug}_{fn}", label_visibility="collapsed")
 
-            # Track processed uploads to avoid rerun loop
+            # Track processed uploads by file identity to avoid rerun loop
             upload_done_key = f'_img_done_{slug}_{fn}'
-            if up and not st.session_state.get(upload_done_key):
+            file_id = f'{up.name}_{up.size}' if up else None
+            if up and st.session_state.get(upload_done_key) != file_id:
                 pil = fix_exif_orientation(Image.open(up))
                 if pil.mode in ('RGBA', 'LA', 'PA', 'P'):
                     pil = pil.convert('RGB')
@@ -905,7 +906,7 @@ def _render_images_tab(slug, dname):
                 with st.spinner("Generating alt text..."):
                     at = generate_alt_text(pil) or ''
                 db.save_image(slug, fn, buf.getvalue(), up.name, at)
-                st.session_state[upload_done_key] = True
+                st.session_state[upload_done_key] = file_id
                 st.success(f"Saved {header.split('(')[0].strip()}!")
                 st.rerun()
             elif not up:
@@ -1159,9 +1160,10 @@ def _render_brand_tab(slug, r_data, dname):
             ul = st.file_uploader("Upload file", type=["jpg", "jpeg", "png", "svg", "webp", "gif"],
                                   key=f"bl_{slug}", label_visibility="collapsed")
             logo_done_key = f'_img_done_{slug}_Logo'
-            if ul and not st.session_state.get(logo_done_key):
+            logo_file_id = f'{ul.name}_{ul.size}' if ul else None
+            if ul and st.session_state.get(logo_done_key) != logo_file_id:
                 db.save_image(slug, "Logo", ul.read(), ul.name)
-                st.session_state[logo_done_key] = True
+                st.session_state[logo_done_key] = logo_file_id
                 st.rerun()
             elif not ul:
                 st.session_state.pop(logo_done_key, None)
@@ -1180,9 +1182,10 @@ def _render_brand_tab(slug, r_data, dname):
             uf = st.file_uploader("Upload file", type=["jpg", "jpeg", "png", "ico", "svg", "webp"],
                                   key=f"bf_{slug}", label_visibility="collapsed")
             fav_done_key = f'_img_done_{slug}_Favicon'
-            if uf and not st.session_state.get(fav_done_key):
+            fav_file_id = f'{uf.name}_{uf.size}' if uf else None
+            if uf and st.session_state.get(fav_done_key) != fav_file_id:
                 db.save_image(slug, "Favicon", uf.read(), uf.name)
-                st.session_state[fav_done_key] = True
+                st.session_state[fav_done_key] = fav_file_id
                 st.rerun()
             elif not uf:
                 st.session_state.pop(fav_done_key, None)
