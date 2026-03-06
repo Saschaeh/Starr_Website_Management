@@ -374,7 +374,7 @@ def _search_resy_url(restaurant_display_name):
         return ""
 
 
-@st.cache_data(ttl=300, show_spinner=False)
+@st.cache_data(ttl=60, show_spinner=False)
 def scrape_website(url):
     """Scrape text content from a restaurant website and key subpages.
 
