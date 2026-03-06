@@ -114,7 +114,11 @@ def _batch_detect(keys, label, download_images=False):
         progress.progress((i + 1) / len(with_url), text=f"Detecting {dname}...")
 
         ok, text, error, detected = scrape_website(url)
-        if not ok or not detected:
+        if not ok:
+            details.append(f"~{dname}~: scrape failed ({error})")
+            continue
+        if not detected:
+            details.append(f"~{dname}~: no data detected")
             continue
 
         fields = {}
@@ -170,6 +174,23 @@ def _batch_detect(keys, label, download_images=False):
     st.success(f"{label}: updated {updated}/{len(with_url)} restaurants.")
     for d in details:
         st.markdown(d)
+
+
+# --- Detect All Missing Data ---
+st.markdown("---")
+st.markdown("### Detect All Missing Data")
+st.markdown("Run all detection (Brand, IDs, Links, Contact) in a single pass.")
+
+if st.button("Detect All Missing Data", type="primary", key="batch_all"):
+    _batch_detect(
+        keys=['primary_color', 'booking_platform', 'opentable_rid', 'resy_url',
+              'tripleseat_form_id', 'order_online_url', 'mailing_list_url',
+              'facebook_url', 'instagram_url', 'spotify_url', 'linkedin_url',
+              'phone', 'email_general', 'email_events', 'email_marketing',
+              'email_press', 'address', 'google_maps_url', 'opening_hours'],
+        label="All",
+        download_images=True,
+    )
 
 
 # --- Batch Brand Detection ---
