@@ -29,6 +29,39 @@ def _is_list_paragraph(para) -> bool:
     return (para.style.name if para.style else "") == "List Paragraph"
 
 
+# Meal-type keywords that indicate a tab-level heading
+_MEAL_TAB_RE = re.compile(
+    r"^\*\*\s*"
+    r"(dinner|lunch|brunch|breakfast|desserts?|bar\s+menu|drinks?|"
+    r"cocktails?|wine|beer|beverages?|happy\s+hour|tasting\s+menu|"
+    r"prix\s+fixe|kids|children|late\s+night|supper)"
+    r"\s*\*\*$",
+    re.IGNORECASE,
+)
+
+# Title lines that act as section separators (not tab content)
+_TITLE_RE = re.compile(
+    r"^\*\*.*(?:working\s+menu|menu\s*s?)\s*\*\*$",
+    re.IGNORECASE,
+)
+
+
+def _promote_bold_to_headings(text: str) -> str:
+    """When no heading styles exist, promote bold meal-type lines to ## headings."""
+    lines = text.split("\n")
+    out: list[str] = []
+    for line in lines:
+        if _TITLE_RE.match(line):
+            inner = line.strip("*").strip()
+            out.append(f"# {inner}")
+        elif _MEAL_TAB_RE.match(line):
+            inner = line.strip("*").strip()
+            out.append(f"## {inner}")
+        else:
+            out.append(line)
+    return "\n".join(out)
+
+
 def extract_text(file_bytes: bytes) -> str:
     """Extract annotated text from a .docx file."""
     doc = Document(BytesIO(file_bytes))
@@ -61,7 +94,13 @@ def extract_text(file_bytes: bytes) -> str:
         else:
             lines.append(text)
 
-    return "\n".join(lines)
+    result = "\n".join(lines)
+
+    # If no ## headings found, promote bold meal-type lines to tab headings
+    if "\n## " not in result and not result.startswith("## "):
+        result = _promote_bold_to_headings(result)
+
+    return result
 
 
 def filter_menu_content(text: str) -> str:
