@@ -222,7 +222,7 @@ def _show_list_view():
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
     _COL_W = [0.3, 1.4, 0.6, 0.7, 0.6, 0.55, 0.5, 0.5, 0.6, 1.6]
-    _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Feedback"]
+    _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Feedback / Change Requests"]
     cols_h = st.columns(_COL_W)
     for col, label in zip(cols_h, _COL_LABELS):
         with col:
@@ -253,7 +253,7 @@ def _show_list_view():
             chc = chef_counts.get(slug, 0)
             cc = copy_counts.get(slug, 0)
 
-            notes = r.get('notes') or ''
+            feedback = r.get('feedback') or ''
             cols = st.columns(_COL_W)
             # Checkbox
             with cols[0]:
@@ -305,14 +305,14 @@ def _show_list_view():
             with cols[8]:
                 st.markdown(_check if contact_ok.get(slug) else _x_orange,
                             unsafe_allow_html=True)
-            # Feedback
+            # Feedback / Change Requests
             with cols[9]:
                 def _save_feedback(s=slug, k=f"fb_{slug}"):
-                    db.update_restaurant(s, notes=st.session_state[k])
+                    db.update_restaurant(s, feedback=st.session_state[k])
                 st.text_input(
-                    "Feedback", value=notes, key=f"fb_{slug}",
+                    "Feedback", value=feedback, key=f"fb_{slug}",
                     label_visibility="collapsed",
-                    placeholder="Add feedback...",
+                    placeholder="Leave feedback...",
                     on_change=_save_feedback,
                 )
 
@@ -475,12 +475,10 @@ def _render_overview(slug, r_data, dname):
         city_idx = cities.index(city_val) if city_val in cities else 0
         new_city = st.selectbox("City", cities, index=city_idx, key=f"ov_city_{slug}")
 
-    notes = st.text_area("Feedback", value=r_data.get('notes') or '',
-                         key=f"ov_notes_{slug}", height=80, placeholder="Add feedback...")
     cs, cd = st.columns([3, 1])
     with cs:
         if st.button("Save Changes", key=f"ov_save_{slug}", type="primary"):
-            fields = {'website_url': url, 'notes': notes}
+            fields = {'website_url': url}
             if new_city:
                 fields['city'] = new_city
             db.update_restaurant(slug, **fields)
@@ -498,6 +496,32 @@ def _render_overview(slug, r_data, dname):
             if st.button("Delete Restaurant", key=f"ov_del_{slug}", type="secondary"):
                 st.session_state[ck] = True
                 st.rerun()
+
+    # --- Feedback / Change Requests ---
+    st.markdown("""<div style="margin-top:1.5rem;padding:1.25rem;background:#FFF7ED;
+        border:1px solid #FED7AA;border-radius:10px;">
+        <div style="font-size:0.8rem;font-weight:700;color:#C2410C;text-transform:uppercase;
+        letter-spacing:0.08em;margin-bottom:0.5rem;">Feedback / Change Requests</div>
+    </div>""", unsafe_allow_html=True)
+    def _save_ov_feedback(s=slug):
+        db.update_restaurant(s, feedback=st.session_state[f"ov_fb_{s}"])
+    st.text_area("Feedback", value=r_data.get('feedback') or '',
+                 key=f"ov_fb_{slug}", height=100,
+                 placeholder="Leave feedback or change requests here — auto-saves...",
+                 on_change=_save_ov_feedback, label_visibility="collapsed")
+
+    # --- Internal Notes ---
+    st.markdown("""<div style="margin-top:1rem;padding:1.25rem;background:#F0F9FF;
+        border:1px solid #BAE6FD;border-radius:10px;">
+        <div style="font-size:0.8rem;font-weight:700;color:#0369A1;text-transform:uppercase;
+        letter-spacing:0.08em;margin-bottom:0.5rem;">Notes</div>
+    </div>""", unsafe_allow_html=True)
+    def _save_ov_notes(s=slug):
+        db.update_restaurant(s, notes=st.session_state[f"ov_notes_{s}"])
+    st.text_area("Notes", value=r_data.get('notes') or '',
+                 key=f"ov_notes_{slug}", height=100,
+                 placeholder="Internal notes — auto-saves...",
+                 on_change=_save_ov_notes, label_visibility="collapsed")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1494,6 +1518,26 @@ def _render_contact_tab(slug, r_data, dname):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def run():
+    st.markdown("""<style>
+        /* Sleeker text areas for feedback & notes */
+        div[data-testid="stTextArea"] textarea {
+            border-radius: 8px !important;
+            border: 1px solid #E5E7EB !important;
+            padding: 0.75rem !important;
+            font-size: 0.9rem !important;
+            line-height: 1.5 !important;
+            transition: border-color 0.2s !important;
+        }
+        div[data-testid="stTextArea"] textarea:focus {
+            border-color: #3B82F6 !important;
+            box-shadow: 0 0 0 2px rgba(59,130,246,0.15) !important;
+        }
+        /* Sleeker text inputs in list view */
+        div[data-testid="stTextInput"] input {
+            border-radius: 6px !important;
+            font-size: 0.8rem !important;
+        }
+    </style>""", unsafe_allow_html=True)
     _selected = st.session_state.get('selected_restaurant')
     if _selected and db.get_restaurant(_selected):
         _show_detail_view(_selected)
