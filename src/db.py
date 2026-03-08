@@ -185,8 +185,11 @@ def init_db():
         except Exception:
             pass  # column already exists
     # One-time: copy notes into feedback where feedback is still empty
-    conn.execute("""UPDATE restaurants SET feedback = notes
-                    WHERE (feedback IS NULL OR feedback = '') AND notes != ''""")
+    try:
+        conn.execute("""UPDATE restaurants SET feedback = notes
+                        WHERE (feedback IS NULL OR feedback = '') AND notes != ''""")
+    except Exception:
+        pass
     _commit(conn)
 
 
