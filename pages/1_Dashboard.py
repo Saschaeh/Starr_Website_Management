@@ -166,8 +166,8 @@ def _show_list_view():
 
     # --- Search + Filters + Actions row ---
     # Filter group                          gap    Manage group
-    fc1, fc2, fc2b, fc3, _gap, fc4, fc5, fc6, fc7 = st.columns(
-        [2, 0.9, 0.8, 0.9, 0.1, 0.6, 0.6, 0.6, 0.7], vertical_alignment="bottom")
+    fc1, fc2, fc2b, fc3, _gap, fc_btns = st.columns(
+        [2, 0.9, 0.8, 0.9, 0.1, 2.6], vertical_alignment="bottom")
     with fc1:
         search = st.text_input("Search", placeholder="Search restaurants...",
                                label_visibility="collapsed", key="ls")
@@ -184,14 +184,17 @@ def _show_list_view():
         status_opts = ["All Status", "Complete", "In Progress", "Not Started"]
         status_filter = st.selectbox("Status", status_opts, label_visibility="collapsed",
                                      key="lf")
-    with fc4:
-        save_clicked = st.button("Save", key="save_btn")
-    with fc5:
-        edit_clicked = st.button("Edit", key="edit_btn")
-    with fc6:
-        delete_clicked = st.button("Delete", key="del_btn")
-    with fc7:
-        if st.button("+ Add Restaurant", key="add_btn"):
+    with fc_btns:
+        b1, b2, b3, b4 = st.columns(4)
+        with b1:
+            add_clicked = st.button("+ Add", key="add_btn")
+        with b2:
+            edit_clicked = st.button("Edit", key="edit_btn")
+        with b3:
+            save_clicked = st.button("Save", key="save_btn")
+        with b4:
+            delete_clicked = st.button("Delete", key="del_btn")
+        if add_clicked:
             st.session_state['show_add_form'] = True
             st.rerun()
 
@@ -1557,6 +1560,22 @@ def run():
         textarea[aria-label="List Feedback"]:focus {
             border-color: #F97316 !important;
             box-shadow: 0 0 0 2px rgba(249,115,22,0.15) !important;
+        }
+        /* Uniform action buttons */
+        button[kind="secondary"] {
+            border: 1px solid #D1D5DB !important;
+            border-radius: 6px !important;
+            font-size: 0.8rem !important;
+            font-weight: 600 !important;
+            padding: 0.4rem 0.75rem !important;
+            background: #FFFFFF !important;
+            color: #374151 !important;
+            width: 100% !important;
+            white-space: nowrap !important;
+        }
+        button[kind="secondary"]:hover {
+            background: #F9FAFB !important;
+            border-color: #9CA3AF !important;
         }
     </style>""", unsafe_allow_html=True)
     _selected = st.session_state.get('selected_restaurant')
