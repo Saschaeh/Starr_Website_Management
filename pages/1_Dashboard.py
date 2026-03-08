@@ -310,10 +310,6 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # Feedback / Change Requests
             with cols[9]:
-                st.markdown(
-                    '<div style="background:#FFF7ED;border:1px solid #FED7AA;'
-                    'border-radius:6px;padding:2px 4px;margin:-4px -8px;">',
-                    unsafe_allow_html=True)
                 def _save_feedback(s=slug, k=f"fb_{slug}"):
                     db.update_restaurant(s, feedback=st.session_state[k])
                 st.text_input(
@@ -322,7 +318,6 @@ def _show_list_view():
                     placeholder="Leave feedback...",
                     on_change=_save_feedback,
                 )
-                st.markdown('</div>', unsafe_allow_html=True)
 
     # --- Handle Edit / Delete actions ---
     selected_slugs = [r['name'] for r in filtered
@@ -1540,10 +1535,17 @@ def run():
             border-color: #3B82F6 !important;
             box-shadow: 0 0 0 2px rgba(59,130,246,0.15) !important;
         }
-        /* Sleeker text inputs in list view */
-        div[data-testid="stTextInput"] input {
+        /* Feedback inputs in list view — orange background */
+        input[aria-label="Feedback"] {
+            background: #FFF7ED !important;
+            border: 1px solid #FED7AA !important;
             border-radius: 6px !important;
             font-size: 0.8rem !important;
+            padding: 0.4rem 0.6rem !important;
+        }
+        input[aria-label="Feedback"]:focus {
+            border-color: #F97316 !important;
+            box-shadow: 0 0 0 2px rgba(249,115,22,0.15) !important;
         }
     </style>""", unsafe_allow_html=True)
     _selected = st.session_state.get('selected_restaurant')
