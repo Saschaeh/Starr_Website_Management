@@ -231,16 +231,15 @@ def _show_list_view():
             db.update_restaurant(s, feedback=fb_val)
         _save_banner.markdown("""
         <style>
-            @keyframes fadeOut {
-                0%   { opacity: 1; }
-                80%  { opacity: 1; }
+            @keyframes vanish {
+                0%, 99%  { opacity: 1; height: auto; padding: 1rem 2rem; margin: 1rem 0; }
                 100% { opacity: 0; height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
             }
         </style>
         <div style="display:flex;align-items:center;justify-content:center;
             padding:1rem 2rem;margin:1rem 0;background:#DCFCE7;border:1px solid #86EFAC;
             border-radius:10px;text-align:center;
-            animation: fadeOut 5s ease forwards;">
+            animation: vanish 5s step-end forwards;">
             <span style="font-size:1rem;font-weight:600;color:#16A34A;">Saved successfully</span>
         </div>""", unsafe_allow_html=True)
 
