@@ -479,64 +479,69 @@ def _show_detail_view(slug):
 
 def _render_overview(slug, r_data, dname):
     st.subheader("Overview")
-    c1, c2 = st.columns(2)
-    with c1:
-        url = st.text_input("Website URL", value=r_data.get('website_url') or '',
-                            key=f"ov_url_{slug}", placeholder="https://...")
-    with c2:
-        city_val = r_data.get('city') or get_city(slug)
-        cities = ["", "New York", "Philadelphia", "Florida", "Nashville",
-                  "Washington D.C.", "Other"]
-        city_idx = cities.index(city_val) if city_val in cities else 0
-        new_city = st.selectbox("City", cities, index=city_idx, key=f"ov_city_{slug}")
+    with st.form(key=f"ov_form_{slug}"):
+        c1, c2 = st.columns(2)
+        with c1:
+            url = st.text_input("Website URL", value=r_data.get('website_url') or '',
+                                key=f"ov_url_{slug}", placeholder="https://...")
+        with c2:
+            city_val = r_data.get('city') or get_city(slug)
+            cities = ["", "New York", "Philadelphia", "Florida", "Nashville",
+                      "Washington D.C.", "Other"]
+            city_idx = cities.index(city_val) if city_val in cities else 0
+            new_city = st.selectbox("City", cities, index=city_idx, key=f"ov_city_{slug}")
 
-    cs, cd = st.columns([3, 1])
-    with cs:
-        if st.button("Save Changes", key=f"ov_save_{slug}", type="primary"):
-            fields = {
-                'website_url': url,
-                'feedback': st.session_state.get(f"ov_fb_{slug}", ''),
-                'notes': st.session_state.get(f"ov_notes_{slug}", ''),
-            }
-            if new_city:
-                fields['city'] = new_city
-            db.update_restaurant(slug, **fields)
-            st.success("Saved!")
+        # --- Feedback / Change Requests ---
+        st.markdown("""<div style="margin-top:1.5rem;padding:0.5rem 0.75rem;background:#FFF7ED;
+            border:1px solid #FED7AA;border-radius:8px 8px 0 0;border-bottom:none;">
+            <span style="font-size:0.75rem;font-weight:700;color:#C2410C;text-transform:uppercase;
+            letter-spacing:0.08em;">Feedback / Change Requests</span>
+        </div>""", unsafe_allow_html=True)
+        feedback = st.text_area("Feedback", value=r_data.get('feedback') or '',
+                     key=f"ov_fb_{slug}", height=68,
+                     placeholder="Leave feedback or change requests here...",
+                     label_visibility="collapsed")
+
+        # --- Internal Notes ---
+        st.markdown("""<div style="margin-top:1rem;padding:0.5rem 0.75rem;background:#F0F9FF;
+            border:1px solid #BAE6FD;border-radius:8px 8px 0 0;border-bottom:none;">
+            <span style="font-size:0.75rem;font-weight:700;color:#0369A1;text-transform:uppercase;
+            letter-spacing:0.08em;">Notes</span>
+        </div>""", unsafe_allow_html=True)
+        notes = st.text_area("Notes", value=r_data.get('notes') or '',
+                     key=f"ov_notes_{slug}", height=68,
+                     placeholder="Internal notes...",
+                     label_visibility="collapsed")
+
+        cs, cd = st.columns([3, 1])
+        with cs:
+            saved = st.form_submit_button("Save Changes", type="primary")
+        with cd:
+            pass
+    if saved:
+        fields = {
+            'website_url': url,
+            'feedback': feedback,
+            'notes': notes,
+        }
+        if new_city:
+            fields['city'] = new_city
+        db.update_restaurant(slug, **fields)
+        st.success("Saved!")
+        st.rerun()
+
+    # Delete button outside form
+    ck = f"ov_cdel_{slug}"
+    if st.session_state.get(ck):
+        if st.button("Confirm Delete?", key=f"ov_dc_{slug}", type="primary"):
+            db.delete_restaurant(slug)
+            st.session_state.pop(ck, None)
+            st.session_state.pop('selected_restaurant', None)
             st.rerun()
-    with cd:
-        ck = f"ov_cdel_{slug}"
-        if st.session_state.get(ck):
-            if st.button("Confirm Delete?", key=f"ov_dc_{slug}", type="primary"):
-                db.delete_restaurant(slug)
-                st.session_state.pop(ck, None)
-                st.session_state.pop('selected_restaurant', None)
-                st.rerun()
-        else:
-            if st.button("Delete Restaurant", key=f"ov_del_{slug}", type="secondary"):
-                st.session_state[ck] = True
-                st.rerun()
-
-    # --- Feedback / Change Requests ---
-    st.markdown("""<div style="margin-top:1.5rem;padding:0.5rem 0.75rem;background:#FFF7ED;
-        border:1px solid #FED7AA;border-radius:8px 8px 0 0;border-bottom:none;">
-        <span style="font-size:0.75rem;font-weight:700;color:#C2410C;text-transform:uppercase;
-        letter-spacing:0.08em;">Feedback / Change Requests</span>
-    </div>""", unsafe_allow_html=True)
-    st.text_area("Feedback", value=r_data.get('feedback') or '',
-                 key=f"ov_fb_{slug}", height=68,
-                 placeholder="Leave feedback or change requests here...",
-                 label_visibility="collapsed")
-
-    # --- Internal Notes ---
-    st.markdown("""<div style="margin-top:1rem;padding:0.5rem 0.75rem;background:#F0F9FF;
-        border:1px solid #BAE6FD;border-radius:8px 8px 0 0;border-bottom:none;">
-        <span style="font-size:0.75rem;font-weight:700;color:#0369A1;text-transform:uppercase;
-        letter-spacing:0.08em;">Notes</span>
-    </div>""", unsafe_allow_html=True)
-    st.text_area("Notes", value=r_data.get('notes') or '',
-                 key=f"ov_notes_{slug}", height=68,
-                 placeholder="Internal notes...",
-                 label_visibility="collapsed")
+    else:
+        if st.button("Delete Restaurant", key=f"ov_del_{slug}", type="secondary"):
+            st.session_state[ck] = True
+            st.rerun()
 
 
 # ═══════════════════════════════════════════════════════════════════════════
