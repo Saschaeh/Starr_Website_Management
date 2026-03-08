@@ -445,19 +445,22 @@ def _show_detail_view(slug):
         st.switch_page("pages/1_Dashboard.py")
 
     # Restaurant header
-    hc1, hc_push, hc2 = st.columns([2, 1.2, 1], vertical_alignment="center")
+    hc1, hc2 = st.columns([3, 1])
     with hc1:
         st.markdown(
             f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
-            f'font-weight:600;margin:0;">{dname}</h1>'
-            f'<p style="color:#6B7280;font-size:0.9rem;margin-top:4px;">{city}</p>',
+            f'font-weight:600;margin:0;">{dname}</h1>',
             unsafe_allow_html=True)
-    with hc_push:
-        push_val = bool(r_data.get('push_changes'))
-        new_push = st.toggle("Push Changes", value=push_val, key=f"push_{slug}")
-        if new_push != push_val:
-            db.update_restaurant(slug, push_changes=int(new_push))
-            st.rerun()
+        nc1, nc2 = st.columns([1, 2])
+        with nc1:
+            st.markdown(f'<p style="color:#6B7280;font-size:0.9rem;margin:0;">{city}</p>',
+                        unsafe_allow_html=True)
+        with nc2:
+            push_val = bool(r_data.get('push_changes'))
+            new_push = st.toggle("Push Changes", value=push_val, key=f"push_{slug}")
+            if new_push != push_val:
+                db.update_restaurant(slug, push_changes=int(new_push))
+                st.rerun()
     with hc2:
         # Quick status pills
         has_menu = slug in menu_slugs
