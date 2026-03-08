@@ -444,34 +444,30 @@ def _show_detail_view(slug):
         st.session_state.pop('selected_restaurant', None)
         st.switch_page("pages/1_Dashboard.py")
 
-    # Restaurant header — name + push toggle on one line
-    _name_col, _push_col, hc2 = st.columns([2, 1, 1], vertical_alignment="bottom")
-    with _name_col:
-        st.markdown(
-            f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
-            f'font-weight:600;margin:0;padding:0;">{dname}</h1>',
-            unsafe_allow_html=True)
-    with _push_col:
-        push_val = bool(r_data.get('push_changes'))
-        new_push = st.toggle("Push Changes", value=push_val, key=f"push_{slug}")
-        if new_push != push_val:
-            db.update_restaurant(slug, push_changes=int(new_push))
-            st.rerun()
-    with hc2:
-        # Quick status pills
-        has_menu = slug in menu_slugs
-        imgs = db.get_images_for_restaurant(slug)
-        ic = sum(1 for v in imgs.values() if v.get('has_image'))
-        cp = db.get_copy_for_restaurant(slug)
-        cc = sum(1 for v in cp.values() if v.strip())
-        st.markdown(
-            f'<div style="text-align:right;padding-top:0.75rem;">'
-            f'{_pill_html("Menu", 1 if has_menu else 0, 1)} '
-            f'{_pill_html("Img", ic, 9)} '
-            f'{_pill_html("Copy", cc, 5)}'
-            f'</div>', unsafe_allow_html=True)
+    # Restaurant header
+    st.markdown(
+        f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
+        f'font-weight:600;margin:0;">{dname}</h1>',
+        unsafe_allow_html=True)
+    push_val = bool(r_data.get('push_changes'))
+    new_push = st.toggle("Push Changes", value=push_val, key=f"push_{slug}")
+    if new_push != push_val:
+        db.update_restaurant(slug, push_changes=int(new_push))
+        st.rerun()
     st.markdown(f'<p style="color:#6B7280;font-size:0.9rem;margin:0;">{city}</p>',
                 unsafe_allow_html=True)
+
+    # Quick status pills
+    has_menu = slug in menu_slugs
+    imgs = db.get_images_for_restaurant(slug)
+    ic = sum(1 for v in imgs.values() if v.get('has_image'))
+    cp = db.get_copy_for_restaurant(slug)
+    cc = sum(1 for v in cp.values() if v.strip())
+    st.markdown(
+        f'{_pill_html("Menu", 1 if has_menu else 0, 1)} '
+        f'{_pill_html("Img", ic, 9)} '
+        f'{_pill_html("Copy", cc, 5)}',
+        unsafe_allow_html=True)
 
     # Tabs
     tab_ov, tab_mn, tab_im, tab_cp, tab_br, tab_res, tab_lnk, tab_loc = st.tabs(
