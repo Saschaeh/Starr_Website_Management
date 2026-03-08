@@ -167,7 +167,7 @@ def _show_list_view():
     # --- Search + Filters + Actions row ---
     # Filter group                          gap    Manage group
     fc1, fc2, fc2b, fc3, _gap, fc_btns = st.columns(
-        [2, 0.9, 0.8, 0.9, 0.1, 2.6], vertical_alignment="bottom")
+        [2, 0.9, 0.8, 0.9, 0.6, 2.1], vertical_alignment="bottom")
     with fc1:
         search = st.text_input("Search", placeholder="Search restaurants...",
                                label_visibility="collapsed", key="ls")
@@ -1562,7 +1562,7 @@ def run():
             box-shadow: 0 0 0 2px rgba(249,115,22,0.15) !important;
         }
         /* Uniform action buttons */
-        button[kind="secondary"] {
+        div[data-testid="stButton"] button {
             border: 1px solid #D1D5DB !important;
             border-radius: 6px !important;
             font-size: 0.8rem !important;
@@ -1572,10 +1572,15 @@ def run():
             color: #374151 !important;
             width: 100% !important;
             white-space: nowrap !important;
+            transition: all 0.15s ease !important;
         }
-        button[kind="secondary"]:hover {
-            background: #F9FAFB !important;
+        div[data-testid="stButton"] button:hover {
+            background: #F3F4F6 !important;
             border-color: #9CA3AF !important;
+            color: #111827 !important;
+        }
+        div[data-testid="stButton"] button:active {
+            background: #E5E7EB !important;
         }
     </style>""", unsafe_allow_html=True)
     _selected = st.session_state.get('selected_restaurant')
