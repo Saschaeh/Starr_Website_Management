@@ -454,8 +454,6 @@ def _show_detail_view(slug):
     if new_push != push_val:
         db.update_restaurant(slug, push_changes=int(new_push))
         st.rerun()
-    st.markdown(f'<p style="color:#6B7280;font-size:0.9rem;margin:0;">{city}</p>',
-                unsafe_allow_html=True)
 
     # Quick status pills
     has_menu = slug in menu_slugs
