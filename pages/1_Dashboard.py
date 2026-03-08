@@ -230,21 +230,21 @@ def _show_list_view():
             fb_val = st.session_state.get(f"fb_{s}", "")
             db.update_restaurant(s, feedback=fb_val)
         _save_banner.markdown("""
-        <div style="display:flex;align-items:center;justify-content:center;gap:12px;
+        <div id="save-banner" style="display:flex;align-items:center;justify-content:center;
             padding:1rem 2rem;margin:1rem 0;background:#DCFCE7;border:1px solid #86EFAC;
-            border-radius:10px;text-align:center;">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#16A34A"
-                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M7.5 12.5C7.5 12.5 8 15 10 15.5C10 15.5 11.5 12 14 9.5C16.5 7 18 6.5 18 6.5
-                    L18.5 8C18.5 8 16 11 14 13.5C12 16 10.5 17.5 10.5 17.5C10.5 17.5 8 18 6.5 16
-                    C5 14 5 12 5 12L7.5 12.5Z" fill="#16A34A" stroke="none"/>
-                <path d="M14 9C14 9 6 2 3.5 5.5C1 9 6 11 6 11"/>
-                <path d="M14 9C14 9 22 5 21 9C20 13 14 13 14 13"/>
-                <path d="M6 11C6 11 3 17 6 19C9 21 12 17 12 17"/>
-                <path d="M12 17C12 17 16 19 18 17C20 15 17 12 14 13"/>
-            </svg>
-            <span style="font-size:1rem;font-weight:600;color:#16A34A;">Feedback saved successfully</span>
-        </div>""", unsafe_allow_html=True)
+            border-radius:10px;text-align:center;transition:opacity 0.5s ease;">
+            <span style="font-size:1rem;font-weight:600;color:#16A34A;">Saved successfully</span>
+        </div>
+        <script>
+            setTimeout(function() {
+                var el = document.getElementById('save-banner');
+                if (el) { el.style.opacity = '0'; }
+            }, 4500);
+            setTimeout(function() {
+                var el = document.getElementById('save-banner');
+                if (el) { el.style.display = 'none'; }
+            }, 5000);
+        </script>""", unsafe_allow_html=True)
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
