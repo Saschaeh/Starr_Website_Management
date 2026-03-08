@@ -260,6 +260,9 @@ def _show_list_view():
             cc = copy_counts.get(slug, 0)
 
             feedback = r.get('feedback') or ''
+            # Only set initial value if not already in session state
+            if f"fb_{slug}" not in st.session_state:
+                st.session_state[f"fb_{slug}"] = feedback
             cols = st.columns(_COL_W)
             # Checkbox
             with cols[0]:
@@ -314,7 +317,7 @@ def _show_list_view():
             # Feedback / Change Requests
             with cols[9]:
                 st.text_area(
-                    "List Feedback", value=feedback, key=f"fb_{slug}",
+                    "List Feedback", key=f"fb_{slug}",
                     label_visibility="collapsed",
                     placeholder="Leave feedback...",
                     height=68,
