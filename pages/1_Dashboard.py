@@ -316,20 +316,24 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # Feedback / Change Requests
             with cols[9]:
-                st.text_area(
-                    "List Feedback", key=f"fb_{slug}",
-                    label_visibility="collapsed",
-                    placeholder="Leave feedback...",
-                    height=68,
-                )
+                @st.fragment
+                def _fb_fragment(s=slug):
+                    st.text_area(
+                        "List Feedback", key=f"fb_{s}",
+                        label_visibility="collapsed",
+                        placeholder="Leave feedback...",
+                        height=68,
+                    )
+                _fb_fragment()
 
     # --- Handle Save / Edit / Delete actions ---
     selected_slugs = [r['name'] for r in filtered
                       if st.session_state.get(f"sel_{r['name']}")]
     if save_clicked:
-        for r in filtered:
-            s = r['name']
-            db.update_restaurant(s, feedback=st.session_state.get(f"fb_{s}", ""))
+        with st.spinner("Saving feedback..."):
+            for r in filtered:
+                s = r['name']
+                db.update_restaurant(s, feedback=st.session_state.get(f"fb_{s}", ""))
         st.toast("Feedback saved.")
         st.rerun()
     if edit_clicked:
