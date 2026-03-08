@@ -312,11 +312,12 @@ def _show_list_view():
             with cols[9]:
                 def _save_feedback(s=slug, k=f"fb_{slug}"):
                     db.update_restaurant(s, feedback=st.session_state[k])
-                st.text_input(
-                    "Feedback", value=feedback, key=f"fb_{slug}",
+                st.text_area(
+                    "List Feedback", value=feedback, key=f"fb_{slug}",
                     label_visibility="collapsed",
                     placeholder="Leave feedback...",
                     on_change=_save_feedback,
+                    height=68,
                 )
 
     # --- Handle Edit / Delete actions ---
@@ -1535,15 +1536,15 @@ def run():
             border-color: #3B82F6 !important;
             box-shadow: 0 0 0 2px rgba(59,130,246,0.15) !important;
         }
-        /* Feedback inputs in list view — orange background */
-        input[aria-label="Feedback"] {
+        /* Feedback text areas in list view — orange background */
+        textarea[aria-label="List Feedback"] {
             background: #FFF7ED !important;
             border: 1px solid #FED7AA !important;
             border-radius: 6px !important;
             font-size: 0.8rem !important;
-            padding: 0.4rem 0.6rem !important;
+            padding: 0.5rem 0.6rem !important;
         }
-        input[aria-label="Feedback"]:focus {
+        textarea[aria-label="List Feedback"]:focus {
             border-color: #F97316 !important;
             box-shadow: 0 0 0 2px rgba(249,115,22,0.15) !important;
         }
