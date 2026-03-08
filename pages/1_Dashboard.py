@@ -327,16 +327,11 @@ def _show_list_view():
     selected_slugs = [r['name'] for r in filtered
                       if st.session_state.get(f"sel_{r['name']}")]
     if save_clicked:
-        count = 0
         for r in filtered:
             s = r['name']
-            fb_val = st.session_state.get(f"fb_{s}", "")
-            if fb_val != (r.get('feedback') or ''):
-                db.update_restaurant(s, feedback=fb_val)
-                count += 1
-        st.toast(f"Saved feedback for {count} restaurant(s)." if count else "No changes to save.")
-        if count:
-            st.rerun()
+            db.update_restaurant(s, feedback=st.session_state.get(f"fb_{s}", ""))
+        st.toast("Feedback saved.")
+        st.rerun()
     if edit_clicked:
         if selected_slugs:
             st.session_state['selected_restaurant'] = selected_slugs[0]
