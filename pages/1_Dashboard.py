@@ -230,21 +230,19 @@ def _show_list_view():
             fb_val = st.session_state.get(f"fb_{s}", "")
             db.update_restaurant(s, feedback=fb_val)
         _save_banner.markdown("""
-        <div id="save-banner" style="display:flex;align-items:center;justify-content:center;
+        <style>
+            @keyframes fadeOut {
+                0%   { opacity: 1; }
+                80%  { opacity: 1; }
+                100% { opacity: 0; height: 0; padding: 0; margin: 0; border: none; overflow: hidden; }
+            }
+        </style>
+        <div style="display:flex;align-items:center;justify-content:center;
             padding:1rem 2rem;margin:1rem 0;background:#DCFCE7;border:1px solid #86EFAC;
-            border-radius:10px;text-align:center;transition:opacity 0.5s ease;">
+            border-radius:10px;text-align:center;
+            animation: fadeOut 5s ease forwards;">
             <span style="font-size:1rem;font-weight:600;color:#16A34A;">Saved successfully</span>
-        </div>
-        <script>
-            setTimeout(function() {
-                var el = document.getElementById('save-banner');
-                if (el) { el.style.opacity = '0'; }
-            }, 4500);
-            setTimeout(function() {
-                var el = document.getElementById('save-banner');
-                if (el) { el.style.display = 'none'; }
-            }, 5000);
-        </script>""", unsafe_allow_html=True)
+        </div>""", unsafe_allow_html=True)
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
