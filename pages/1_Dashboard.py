@@ -221,12 +221,15 @@ def _show_list_view():
 
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
-    _COL_W = [0.3, 1.4, 0.6, 0.7, 0.6, 0.55, 0.5, 0.5, 0.6, 1.6]
+    _COL_W = [0.3, 1.3, 0.45, 0.6, 0.45, 0.45, 0.4, 0.4, 0.5, 2.5]
     _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Feedback / Change Requests"]
+    _fb_hdr = '<span style="font-size:0.7rem;font-weight:700;color:#C2410C;text-transform:uppercase;letter-spacing:0.08em;">'
     cols_h = st.columns(_COL_W)
     for col, label in zip(cols_h, _COL_LABELS):
         with col:
-            if label:
+            if label == "Feedback / Change Requests":
+                st.markdown(f'{_fb_hdr}{label}</span>', unsafe_allow_html=True)
+            elif label:
                 st.markdown(f'{_hdr}{label}</span>', unsafe_allow_html=True)
 
     st.markdown('<hr style="margin:0 0 4px 0;border:none;border-top:2px solid #E5E7EB;">',
@@ -307,6 +310,10 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # Feedback / Change Requests
             with cols[9]:
+                st.markdown(
+                    '<div style="background:#FFF7ED;border:1px solid #FED7AA;'
+                    'border-radius:6px;padding:2px 4px;margin:-4px -8px;">',
+                    unsafe_allow_html=True)
                 def _save_feedback(s=slug, k=f"fb_{slug}"):
                     db.update_restaurant(s, feedback=st.session_state[k])
                 st.text_input(
@@ -315,6 +322,7 @@ def _show_list_view():
                     placeholder="Leave feedback...",
                     on_change=_save_feedback,
                 )
+                st.markdown('</div>', unsafe_allow_html=True)
 
     # --- Handle Edit / Delete actions ---
     selected_slugs = [r['name'] for r in filtered
@@ -498,28 +506,28 @@ def _render_overview(slug, r_data, dname):
                 st.rerun()
 
     # --- Feedback / Change Requests ---
-    st.markdown("""<div style="margin-top:1.5rem;padding:1.25rem;background:#FFF7ED;
-        border:1px solid #FED7AA;border-radius:10px;">
-        <div style="font-size:0.8rem;font-weight:700;color:#C2410C;text-transform:uppercase;
-        letter-spacing:0.08em;margin-bottom:0.5rem;">Feedback / Change Requests</div>
+    st.markdown("""<div style="margin-top:1.5rem;padding:0.5rem 0.75rem;background:#FFF7ED;
+        border:1px solid #FED7AA;border-radius:8px 8px 0 0;border-bottom:none;">
+        <span style="font-size:0.75rem;font-weight:700;color:#C2410C;text-transform:uppercase;
+        letter-spacing:0.08em;">Feedback / Change Requests</span>
     </div>""", unsafe_allow_html=True)
     def _save_ov_feedback(s=slug):
         db.update_restaurant(s, feedback=st.session_state[f"ov_fb_{s}"])
     st.text_area("Feedback", value=r_data.get('feedback') or '',
-                 key=f"ov_fb_{slug}", height=100,
+                 key=f"ov_fb_{slug}", height=68,
                  placeholder="Leave feedback or change requests here — auto-saves...",
                  on_change=_save_ov_feedback, label_visibility="collapsed")
 
     # --- Internal Notes ---
-    st.markdown("""<div style="margin-top:1rem;padding:1.25rem;background:#F0F9FF;
-        border:1px solid #BAE6FD;border-radius:10px;">
-        <div style="font-size:0.8rem;font-weight:700;color:#0369A1;text-transform:uppercase;
-        letter-spacing:0.08em;margin-bottom:0.5rem;">Notes</div>
+    st.markdown("""<div style="margin-top:1rem;padding:0.5rem 0.75rem;background:#F0F9FF;
+        border:1px solid #BAE6FD;border-radius:8px 8px 0 0;border-bottom:none;">
+        <span style="font-size:0.75rem;font-weight:700;color:#0369A1;text-transform:uppercase;
+        letter-spacing:0.08em;">Notes</span>
     </div>""", unsafe_allow_html=True)
     def _save_ov_notes(s=slug):
         db.update_restaurant(s, notes=st.session_state[f"ov_notes_{s}"])
     st.text_area("Notes", value=r_data.get('notes') or '',
-                 key=f"ov_notes_{slug}", height=100,
+                 key=f"ov_notes_{slug}", height=68,
                  placeholder="Internal notes — auto-saves...",
                  on_change=_save_ov_notes, label_visibility="collapsed")
 
