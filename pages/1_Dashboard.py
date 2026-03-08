@@ -166,8 +166,8 @@ def _show_list_view():
 
     # --- Search + Filters + Actions row ---
     # Filter group                          gap    Manage group
-    fc1, fc2, fc2b, fc3, _gap, fc4, fc5, fc6 = st.columns(
-        [2, 0.9, 0.8, 0.9, 0.3, 0.7, 0.7, 0.7], vertical_alignment="bottom")
+    fc1, fc2, fc2b, fc3, _gap, fc4, fc5, fc6, fc7 = st.columns(
+        [2, 0.9, 0.8, 0.9, 0.3, 0.3, 0.7, 0.7, 0.7], vertical_alignment="bottom")
     with fc1:
         search = st.text_input("Search", placeholder="Search restaurants...",
                                label_visibility="collapsed", key="ls")
@@ -185,10 +185,12 @@ def _show_list_view():
         status_filter = st.selectbox("Status", status_opts, label_visibility="collapsed",
                                      key="lf")
     with fc4:
-        edit_clicked = st.button("Edit", key="edit_btn")
+        save_clicked = st.button("Save", key="save_btn")
     with fc5:
-        delete_clicked = st.button("Delete", key="del_btn")
+        edit_clicked = st.button("Edit", key="edit_btn")
     with fc6:
+        delete_clicked = st.button("Delete", key="del_btn")
+    with fc7:
         if st.button("+ Add Restaurant", key="add_btn"):
             st.session_state['show_add_form'] = True
             st.rerun()
@@ -310,19 +312,27 @@ def _show_list_view():
                             unsafe_allow_html=True)
             # Feedback / Change Requests
             with cols[9]:
-                def _save_feedback(s=slug, k=f"fb_{slug}"):
-                    db.update_restaurant(s, feedback=st.session_state[k])
                 st.text_area(
                     "List Feedback", value=feedback, key=f"fb_{slug}",
                     label_visibility="collapsed",
                     placeholder="Leave feedback...",
-                    on_change=_save_feedback,
                     height=68,
                 )
 
-    # --- Handle Edit / Delete actions ---
+    # --- Handle Save / Edit / Delete actions ---
     selected_slugs = [r['name'] for r in filtered
                       if st.session_state.get(f"sel_{r['name']}")]
+    if save_clicked:
+        if selected_slugs:
+            count = 0
+            for s in selected_slugs:
+                fb_val = st.session_state.get(f"fb_{s}", "")
+                db.update_restaurant(s, feedback=fb_val)
+                count += 1
+            st.toast(f"Saved feedback for {count} restaurant(s).")
+            st.rerun()
+        else:
+            st.toast("Select restaurant(s) to save.")
     if edit_clicked:
         if selected_slugs:
             st.session_state['selected_restaurant'] = selected_slugs[0]
