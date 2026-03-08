@@ -167,7 +167,7 @@ def _show_list_view():
     # --- Search + Filters + Actions row ---
     # Filter group                          gap    Manage group
     c1, c2, c3, c4, _sp, c5, c6, c7, c8 = st.columns(
-        [2, 1, 1, 1, 0.3, 0.7, 0.7, 0.7, 0.7], vertical_alignment="bottom")
+        [2, 1, 1, 1, 0.2, 0.8, 0.8, 0.8, 0.8], vertical_alignment="bottom")
     with c1:
         search = st.text_input("Search", placeholder="Search restaurants...",
                                label_visibility="collapsed", key="ls")
