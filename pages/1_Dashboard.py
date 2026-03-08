@@ -222,7 +222,7 @@ def _show_list_view():
     # --- Table header ---
     _hdr = '<span style="font-size:0.7rem;font-weight:700;color:#6B7280;text-transform:uppercase;letter-spacing:0.08em;">'
     _COL_W = [0.3, 1.4, 0.6, 0.7, 0.6, 0.55, 0.5, 0.5, 0.6, 1.6]
-    _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Notes"]
+    _COL_LABELS = ["", "Name", "Menu", "Images", "Copy", "Brand", "IDs", "Links", "Contact", "Feedback"]
     cols_h = st.columns(_COL_W)
     for col, label in zip(cols_h, _COL_LABELS):
         with col:
@@ -305,16 +305,16 @@ def _show_list_view():
             with cols[8]:
                 st.markdown(_check if contact_ok.get(slug) else _x_orange,
                             unsafe_allow_html=True)
-            # Notes
+            # Feedback
             with cols[9]:
-                if notes:
-                    st.markdown(
-                        f'<span style="font-size:0.75rem;color:#6B7280;white-space:nowrap;'
-                        f'overflow:hidden;text-overflow:ellipsis;display:block;max-width:100%;"'
-                        f' title="{notes}">{notes}</span>',
-                        unsafe_allow_html=True)
-                else:
-                    st.markdown(_dash, unsafe_allow_html=True)
+                def _save_feedback(s=slug, k=f"fb_{slug}"):
+                    db.update_restaurant(s, notes=st.session_state[k])
+                st.text_input(
+                    "Feedback", value=notes, key=f"fb_{slug}",
+                    label_visibility="collapsed",
+                    placeholder="Add feedback...",
+                    on_change=_save_feedback,
+                )
 
     # --- Handle Edit / Delete actions ---
     selected_slugs = [r['name'] for r in filtered
@@ -475,8 +475,8 @@ def _render_overview(slug, r_data, dname):
         city_idx = cities.index(city_val) if city_val in cities else 0
         new_city = st.selectbox("City", cities, index=city_idx, key=f"ov_city_{slug}")
 
-    notes = st.text_area("Notes", value=r_data.get('notes') or '',
-                         key=f"ov_notes_{slug}", height=80, placeholder="Internal notes...")
+    notes = st.text_area("Feedback", value=r_data.get('notes') or '',
+                         key=f"ov_notes_{slug}", height=80, placeholder="Add feedback...")
     cs, cd = st.columns([3, 1])
     with cs:
         if st.button("Save Changes", key=f"ov_save_{slug}", type="primary"):
