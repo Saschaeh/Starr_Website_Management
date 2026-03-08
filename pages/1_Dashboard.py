@@ -493,7 +493,11 @@ def _render_overview(slug, r_data, dname):
     cs, cd = st.columns([3, 1])
     with cs:
         if st.button("Save Changes", key=f"ov_save_{slug}", type="primary"):
-            fields = {'website_url': url}
+            fields = {
+                'website_url': url,
+                'feedback': st.session_state.get(f"ov_fb_{slug}", ''),
+                'notes': st.session_state.get(f"ov_notes_{slug}", ''),
+            }
             if new_city:
                 fields['city'] = new_city
             db.update_restaurant(slug, **fields)
@@ -518,12 +522,10 @@ def _render_overview(slug, r_data, dname):
         <span style="font-size:0.75rem;font-weight:700;color:#C2410C;text-transform:uppercase;
         letter-spacing:0.08em;">Feedback / Change Requests</span>
     </div>""", unsafe_allow_html=True)
-    def _save_ov_feedback(s=slug):
-        db.update_restaurant(s, feedback=st.session_state[f"ov_fb_{s}"])
     st.text_area("Feedback", value=r_data.get('feedback') or '',
                  key=f"ov_fb_{slug}", height=68,
-                 placeholder="Leave feedback or change requests here — auto-saves...",
-                 on_change=_save_ov_feedback, label_visibility="collapsed")
+                 placeholder="Leave feedback or change requests here...",
+                 label_visibility="collapsed")
 
     # --- Internal Notes ---
     st.markdown("""<div style="margin-top:1rem;padding:0.5rem 0.75rem;background:#F0F9FF;
@@ -531,12 +533,10 @@ def _render_overview(slug, r_data, dname):
         <span style="font-size:0.75rem;font-weight:700;color:#0369A1;text-transform:uppercase;
         letter-spacing:0.08em;">Notes</span>
     </div>""", unsafe_allow_html=True)
-    def _save_ov_notes(s=slug):
-        db.update_restaurant(s, notes=st.session_state[f"ov_notes_{s}"])
     st.text_area("Notes", value=r_data.get('notes') or '',
                  key=f"ov_notes_{slug}", height=68,
-                 placeholder="Internal notes — auto-saves...",
-                 on_change=_save_ov_notes, label_visibility="collapsed")
+                 placeholder="Internal notes...",
+                 label_visibility="collapsed")
 
 
 # ═══════════════════════════════════════════════════════════════════════════
