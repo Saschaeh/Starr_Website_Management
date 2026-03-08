@@ -181,7 +181,7 @@ def _show_list_view():
         tpl_opts = ["All Templates", "Standard", "Custom"]
         tpl_filter = st.selectbox("Template", tpl_opts, label_visibility="collapsed", key="lt")
     with c4:
-        status_opts = ["All Status", "Complete", "In Progress", "Not Started"]
+        status_opts = ["All Status", "Complete", "In Progress", "Not Started", "Push Changes"]
         status_filter = st.selectbox("Status", status_opts, label_visibility="collapsed",
                                      key="lf")
     with c5:
@@ -221,6 +221,8 @@ def _show_list_view():
                     and not ids_ok.get(r['name'])
                     and not links_ok.get(r['name'])
                     and not contact_ok.get(r['name'])]
+    elif status_filter == "Push Changes":
+        filtered = [r for r in filtered if r.get('push_changes')]
 
     # --- Save feedback banner placeholder ---
     _save_banner = st.empty()
@@ -443,16 +445,20 @@ def _show_detail_view(slug):
         st.switch_page("pages/1_Dashboard.py")
 
     # Restaurant header
-    hc1, hc2 = st.columns([3, 1])
+    hc1, hc2, hc3 = st.columns([3, 1, 1])
     with hc1:
-        stg_url = _staging_url(slug)
-        link_html = f' <a href="{stg_url}" target="_blank" style="font-size:0.85rem;color:#6B7280;text-decoration:none;font-weight:400;">&#128279;</a>' if stg_url else ''
         st.markdown(
             f'<h1 style="font-family:\'Playfair Display\',serif;font-size:2rem;'
-            f'font-weight:600;margin:0;">{dname}{link_html}</h1>'
+            f'font-weight:600;margin:0;">{dname}</h1>'
             f'<p style="color:#6B7280;font-size:0.9rem;margin-top:4px;">{city}</p>',
             unsafe_allow_html=True)
     with hc2:
+        push_val = bool(r_data.get('push_changes'))
+        new_push = st.toggle("Push Changes", value=push_val, key=f"push_{slug}")
+        if new_push != push_val:
+            db.update_restaurant(slug, push_changes=int(new_push))
+            st.rerun()
+    with hc3:
         # Quick status pills
         has_menu = slug in menu_slugs
         imgs = db.get_images_for_restaurant(slug)
