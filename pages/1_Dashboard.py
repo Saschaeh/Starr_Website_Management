@@ -166,32 +166,30 @@ def _show_list_view():
 
     # --- Search + Filters + Actions row ---
     # Filter group                          gap    Manage group
-    fc1, fc2, fc2b, fc3 = st.columns(
-        [2.5, 1, 1, 1], vertical_alignment="bottom")
-    with fc1:
+    c1, c2, c3, c4, c5, c6, c7, c8 = st.columns(8, vertical_alignment="bottom")
+    with c1:
         search = st.text_input("Search", placeholder="Search restaurants...",
                                label_visibility="collapsed", key="ls")
-    with fc2:
+    with c2:
         city_opts = ["All Cities"] + CITY_ORDER
         extras = sorted(set(r.get('city', '') for r in restaurants) - set(CITY_ORDER) - {''})
         if extras:
             city_opts += extras
         city_filter = st.selectbox("City", city_opts, label_visibility="collapsed", key="lc")
-    with fc2b:
+    with c3:
         tpl_opts = ["All Templates", "Standard", "Custom"]
         tpl_filter = st.selectbox("Template", tpl_opts, label_visibility="collapsed", key="lt")
-    with fc3:
+    with c4:
         status_opts = ["All Status", "Complete", "In Progress", "Not Started"]
         status_filter = st.selectbox("Status", status_opts, label_visibility="collapsed",
                                      key="lf")
-    _bspc, b1, b2, b3, b4 = st.columns([3, 1, 1, 1, 1], vertical_alignment="bottom")
-    with b1:
+    with c5:
         add_clicked = st.button("+ Add", key="add_btn", use_container_width=True)
-    with b2:
+    with c6:
         edit_clicked = st.button("Edit", key="edit_btn", use_container_width=True)
-    with b3:
+    with c7:
         save_clicked = st.button("Save", key="save_btn", use_container_width=True)
-    with b4:
+    with c8:
         delete_clicked = st.button("Delete", key="del_btn", use_container_width=True)
     if add_clicked:
         st.session_state['show_add_form'] = True
