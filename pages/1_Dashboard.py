@@ -334,8 +334,8 @@ def _show_list_view():
             for r in filtered:
                 s = r['name']
                 db.update_restaurant(s, feedback=st.session_state.get(f"fb_{s}", ""))
-        st.toast("Feedback saved.")
-        st.rerun()
+            time.sleep(0.5)
+        st.success("✅ Feedback saved successfully.")
     if edit_clicked:
         if selected_slugs:
             st.session_state['selected_restaurant'] = selected_slugs[0]
