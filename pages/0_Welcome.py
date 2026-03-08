@@ -76,7 +76,7 @@ st.markdown("""
     text-transform: uppercase;
     color: #6B7280;
     margin-bottom: 0.75rem;
-">Portfolio at a Glance</div>
+">Summary</div>
 """, unsafe_allow_html=True)
 
 c1, c2, c3, c4 = st.columns(4)
