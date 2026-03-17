@@ -1075,7 +1075,6 @@ def _render_images_tab(slug, dname):
 
 def _render_copy_tab(slug, r_data, dname):
     st.subheader("Copy")
-    st.caption("🔧 Debug mode active — v3")
     from src.cms.copy_generator import (
         COPY_SECTIONS, generate_copy, load_master_instructions,
         save_master_instructions, DEFAULT_COPY_INSTRUCTIONS)
@@ -1154,17 +1153,6 @@ def _render_copy_tab(slug, r_data, dname):
                     st.rerun()
                 else:
                     st.error(err)
-
-    # Show warnings that survived st.rerun()
-    _cg_warn = st.session_state.pop('_copy_gen_warning', '')
-    if _cg_warn:
-        st.warning(_cg_warn)
-    _dbg = st.session_state.get('_debug_copy')
-    if _dbg:
-        if _dbg.get('status') == 'error':
-            st.error(f"Copy generation failed: {_dbg.get('error', 'unknown')}")
-        with st.expander("Debug: Last Copy Generation Result", expanded=True):
-            st.json(_dbg)
 
     # === Website Copy ===
     st.subheader("Website Copy")

@@ -1,26 +1,33 @@
-"""Alt text generation using HuggingFace Inference API (Qwen Vision)."""
+"""Alt text generation using Anthropic Claude API."""
 
 import base64
 import io
+import os
 
 import streamlit as st
-from huggingface_hub import InferenceClient
+import anthropic
 
 
-@st.cache_resource
-def _get_hf_client(token):
-    """Return a cached InferenceClient instance."""
-    return InferenceClient(token=token)
+def _get_api_key():
+    """Get Anthropic API key from secrets or env."""
+    try:
+        key = st.secrets.get("ANTHROPIC_API_KEY", None)
+    except Exception:
+        key = None
+    if not key:
+        key = os.getenv("ANTHROPIC_API_KEY", "")
+    return key
 
 
 def generate_alt_text(pil_image):
     """Generate ADA-compliant alt text from a PIL image.
 
-    Uses Qwen Vision model via HuggingFace Inference API.
+    Uses Claude vision via Anthropic API.
     Returns the alt text string, or None on failure.
     """
-    api_token = st.session_state.get('hf_api_token', '')
-    if not api_token:
+    api_key = _get_api_key()
+    if not api_key:
+        st.warning("Alt text generation unavailable: ANTHROPIC_API_KEY not configured.")
         return None
 
     img_buffer = io.BytesIO()
@@ -30,13 +37,18 @@ def generate_alt_text(pil_image):
     img_b64 = base64.b64encode(img_buffer.getvalue()).decode()
 
     try:
-        client = _get_hf_client(api_token)
-        result = client.chat_completion(
-            model="Qwen/Qwen2.5-VL-7B-Instruct",
+        client = anthropic.Anthropic(api_key=api_key)
+        result = client.messages.create(
+            model="claude-sonnet-4-5",
+            max_tokens=100,
             messages=[{
                 "role": "user",
                 "content": [
-                    {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{img_b64}"}},
+                    {"type": "image", "source": {
+                        "type": "base64",
+                        "media_type": "image/jpeg",
+                        "data": img_b64,
+                    }},
                     {"type": "text", "text": (
                         "Write a concise, descriptive alt text for this image suitable for "
                         "ADA/WCAG compliance on a restaurant website. Focus on what is visually "
@@ -45,17 +57,14 @@ def generate_alt_text(pil_image):
                     )}
                 ]
             }],
-            max_tokens=100,
         )
-        return result.choices[0].message.content.strip()
+        return result.content[0].text.strip()
+    except anthropic.AuthenticationError:
+        st.warning("Alt text generation failed: Invalid Anthropic API key.")
+        return None
+    except anthropic.RateLimitError:
+        st.warning("Alt text generation: Rate limit reached. Try again in a minute.")
+        return None
     except Exception as e:
-        error_str = str(e).lower()
-        if '401' in error_str or 'unauthorized' in error_str:
-            st.warning("Alt text generation unavailable: Invalid HF token in .env file.")
-        elif '403' in error_str or 'permission' in error_str:
-            st.warning("HF token needs 'Inference Providers' permission.")
-        elif '503' in error_str or 'loading' in error_str:
-            st.info("Alt text model is loading, please try again in a few seconds.")
-        else:
-            st.warning("Alt text generation temporarily unavailable.")
+        st.warning(f"Alt text generation failed: {e}")
         return None

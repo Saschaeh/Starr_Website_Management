@@ -133,24 +133,13 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = result.content[0].text.strip()
-        st.session_state['_debug_copy'] = {
-            'status': 'ok',
-            'response': response_text,
-            'stop': result.stop_reason,
-            'tokens': result.usage.output_tokens,
-            'section': section,
-        }
     except anthropic.AuthenticationError:
-        st.session_state['_debug_copy'] = {'status': 'error', 'error': 'Invalid Anthropic API key.'}
         return False, {}, "Invalid Anthropic API key."
     except anthropic.RateLimitError:
-        st.session_state['_debug_copy'] = {'status': 'error', 'error': 'Rate limit reached.'}
         return False, {}, "Rate limit reached. Please wait a minute and try again."
     except anthropic.APIStatusError as e:
-        st.session_state['_debug_copy'] = {'status': 'error', 'error': f'API error: {e.message}'}
         return False, {}, f"API error: {e.message}"
     except Exception as e:
-        st.session_state['_debug_copy'] = {'status': 'error', 'error': str(e)}
         return False, {}, f"Copy generation failed: {e}"
 
     if section:
