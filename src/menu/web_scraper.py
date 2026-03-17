@@ -51,7 +51,7 @@ def scrape_menu_page(url: str, timeout: int = 20) -> str:
     resp = requests.get(url, headers=_HEADERS, timeout=timeout)
     resp.raise_for_status()
 
-    soup = BeautifulSoup(resp.text, "html.parser")
+    soup = BeautifulSoup(resp.content, "html.parser")
 
     for tag in soup.find_all(_STRIP_TAGS):
         tag.decompose()
