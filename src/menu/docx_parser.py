@@ -166,7 +166,7 @@ def filter_menu_content(text: str) -> str:
 
     if menu_start is None:
         for i, line in enumerate(lines):
-            if line.startswith("## "):
+            if line.startswith("## ") or re.match(r"^#\s+(?!THE\s+MENUS)", line):
                 menu_start = i
                 break
 
