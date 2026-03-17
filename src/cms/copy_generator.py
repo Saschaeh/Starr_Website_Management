@@ -168,7 +168,6 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
         return False, {}, "Could not parse generated copy. Please try again."
 
     if missing:
-        warn = f"Empty sections: {', '.join(missing)}. Raw response stored in session state '_debug_copy_response'."
-        return True, copy_dict, warn
+        return True, copy_dict, f"Empty sections: {', '.join(missing)}. Try 'Regen' for those sections."
 
     return True, copy_dict, ""

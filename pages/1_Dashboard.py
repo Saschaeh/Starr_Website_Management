@@ -1184,7 +1184,7 @@ def _render_copy_tab(slug, r_data, dname):
                             elif err:
                                 st.error(err)
                             else:
-                                st.warning(f"Generation returned empty for {label}. Check terminal for debug output.")
+                                st.warning(f"Generation returned empty for {label}. Try again.")
                         else:
                             st.error(error)
 
@@ -1212,7 +1212,7 @@ def _render_copy_tab(slug, r_data, dname):
                             elif err:
                                 st.error(err)
                             else:
-                                st.warning(f"Generation returned empty for {label}. Check terminal for debug output.")
+                                st.warning(f"Generation returned empty for {label}. Try again.")
                         else:
                             st.error(error)
 
