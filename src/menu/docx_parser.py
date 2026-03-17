@@ -62,18 +62,69 @@ def _promote_bold_to_headings(text: str) -> str:
     return "\n".join(out)
 
 
+_COLUMN_MARKER_RE = re.compile(r"^.?\s*Column\s+\d+\s*.?$", re.IGNORECASE)
+
+
+def _extract_table_rows(tbl_element, doc) -> list[str]:
+    """Extract rows from a table XML element as 'item — description  price' lines."""
+    from docx.table import Table
+    table = Table(tbl_element, doc)
+    rows: list[str] = []
+    for ri, row in enumerate(table.rows):
+        cells = [c.text.strip().replace("\xa0", " ") for c in row.cells]
+        # Skip header rows like ['Item', 'Description', 'Price']
+        if ri == 0 and cells and cells[0].lower() in ("item", "name", "dish"):
+            continue
+        # Skip empty rows
+        if not any(cells):
+            continue
+        name = cells[0] if len(cells) > 0 else ""
+        desc = cells[1] if len(cells) > 1 else ""
+        price = cells[2] if len(cells) > 2 else ""
+        parts = [name]
+        if desc:
+            parts.append(desc)
+        line = " — ".join(parts)
+        if price:
+            line += f"  {price}"
+        rows.append(line)
+    return rows
+
+
 def extract_text(file_bytes: bytes) -> str:
-    """Extract annotated text from a .docx file."""
+    """Extract annotated text from a .docx file, including tables."""
     doc = Document(BytesIO(file_bytes))
     lines: list[str] = []
     in_menu_section = False
 
-    for para in doc.paragraphs:
+    body = doc.element.body
+    para_tag = qn("w:body") and "p"  # just 'p'
+    tbl_tag = "tbl"
+
+    for child in body:
+        tag = child.tag.split("}")[-1] if "}" in child.tag else child.tag
+
+        if tag == "tbl":
+            rows = _extract_table_rows(child, doc)
+            lines.extend(rows)
+            continue
+
+        if tag != "p":
+            continue
+
+        # It's a paragraph — reconstruct via python-docx Paragraph object
+        from docx.text.paragraph import Paragraph
+        para = Paragraph(child, doc)
+
         text = para.text.strip()
         if not text:
             continue
 
         text = text.replace("\xa0", " ")
+
+        # Skip column markers like "— Column 1 —"
+        if _COLUMN_MARKER_RE.match(text):
+            continue
 
         heading = _get_heading_level(para)
         if heading == 1:
