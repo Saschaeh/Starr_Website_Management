@@ -27,7 +27,7 @@ except Exception:
 def _get_app_password():
     try:
         return st.secrets["auth"]["password"]
-    except (KeyError, FileNotFoundError):
+    except Exception:
         return os.environ.get("APP_PASSWORD")
 
 def _check_password():
