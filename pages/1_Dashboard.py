@@ -1041,10 +1041,13 @@ def _render_images_tab(slug, dname):
                             g = generate_alt_text(Image.open(io.BytesIO(idata)))
                         if g:
                             db.update_alt_text(slug, fn, g)
-                            st.success(f"Alt text generated!")
+                            st.session_state[f'_ada_result_{fn}'] = f"Saved: {g[:80]}"
                             st.rerun()
                         else:
                             st.error("Alt text generation failed. Check that ANTHROPIC_API_KEY is set in Streamlit secrets.")
+                    _ada_msg = st.session_state.pop(f'_ada_result_{fn}', '')
+                    if _ada_msg:
+                        st.success(_ada_msg)
                 with bc3:
                     if st.button("Remove Image", key=f"imgbtn_del_{slug}_{fn}"):
                         db.delete_image(slug, fn)
