@@ -979,7 +979,7 @@ def _render_images_tab(slug, dname):
                     at = generate_alt_text(pil) or ''
                 db.save_image(slug, fn, buf.getvalue(), up.name, at)
                 if at:
-                    st.session_state[f"ia_{slug}_{fn}"] = at
+                    st.session_state[f"_pending_alt_{slug}_{fn}"] = at
                 st.session_state[upload_done_key] = file_id
                 st.success(f"Saved {header.split('(')[0].strip()}!")
                 st.rerun()
@@ -1018,6 +1018,10 @@ def _render_images_tab(slug, dname):
                 st.markdown('<div class="field-label">Alt Text (ADA)</div>',
                             unsafe_allow_html=True)
                 alt_key = f"ia_{slug}_{fn}"
+                _pending = st.session_state.pop(f"_pending_alt_{slug}_{fn}", None)
+                if _pending is not None:
+                    alt = _pending
+                    st.session_state[alt_key] = _pending
                 new_alt = st.text_area(
                     f"Alt text for {header}", value=alt,
                     key=alt_key, label_visibility="collapsed", height=68)
@@ -1042,7 +1046,7 @@ def _render_images_tab(slug, dname):
                             g = generate_alt_text(Image.open(io.BytesIO(idata)))
                         if g:
                             db.update_alt_text(slug, fn, g)
-                            st.session_state[alt_key] = g
+                            st.session_state[f"_pending_alt_{slug}_{fn}"] = g
                             st.rerun()
                         else:
                             st.error("Alt text generation failed. Check that ANTHROPIC_API_KEY is set in Streamlit secrets.")
