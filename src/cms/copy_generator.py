@@ -133,9 +133,9 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = result.content[0].text.strip()
-        print(f"[CopyGen] stop_reason={result.stop_reason} "
-              f"tokens={result.usage.output_tokens} section={section}")
-        print(f"[CopyGen] response preview: {response_text[:500]}")
+        st.session_state['_debug_copy_response'] = response_text
+        st.session_state['_debug_copy_stop'] = result.stop_reason
+        st.session_state['_debug_copy_tokens'] = result.usage.output_tokens
     except anthropic.AuthenticationError:
         return False, {}, "Invalid Anthropic API key."
     except anthropic.RateLimitError:
@@ -166,11 +166,12 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
         copy_dict[key] = match.group(1).strip() if match else ""
 
     missing = [k for k, v in copy_dict.items() if not v]
-    if missing:
-        print(f"[CopyGen] WARNING: empty sections: {missing}")
-        print(f"[CopyGen] full response:\n{response_text}")
 
     if not any(copy_dict.values()):
         return False, {}, "Could not parse generated copy. Please try again."
+
+    if missing:
+        warn = f"Empty sections: {', '.join(missing)}. Raw response stored in session state '_debug_copy_response'."
+        return True, copy_dict, warn
 
     return True, copy_dict, ""

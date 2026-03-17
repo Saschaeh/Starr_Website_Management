@@ -1144,22 +1144,26 @@ def _render_copy_tab(slug, r_data, dname):
                 with st.spinner("Generating copy..."):
                     success, cd, err = generate_copy(text, dname, instructions=instr)
                 if success:
-                    populated = []
-                    empty = []
                     for sid, content in cd.items():
                         if content:
                             st.session_state[f"{slug}_copy_{sid}"] = content
                             st.session_state[f"_w_{slug}_copy_{sid}"] = content
-                            populated.append(sid)
-                        else:
-                            empty.append(sid)
-                    if populated:
-                        st.success("Generated!")
-                    if empty:
-                        st.warning(f"Could not generate: {', '.join(empty)}. Try 'Regen' for those sections.")
+                    if err:
+                        st.session_state['_copy_gen_warning'] = err
                     st.rerun()
                 else:
                     st.error(err)
+
+    # Show warnings that survived st.rerun()
+    _cg_warn = st.session_state.pop('_copy_gen_warning', '')
+    if _cg_warn:
+        st.warning(_cg_warn)
+    _dbg_resp = st.session_state.get('_debug_copy_response', '')
+    if _dbg_resp:
+        with st.expander("Debug: Last API Response", expanded=False):
+            st.text(f"Stop reason: {st.session_state.get('_debug_copy_stop', '?')}")
+            st.text(f"Output tokens: {st.session_state.get('_debug_copy_tokens', '?')}")
+            st.code(_dbg_resp, language=None)
 
     # === Website Copy ===
     st.subheader("Website Copy")
