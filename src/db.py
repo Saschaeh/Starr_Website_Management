@@ -196,6 +196,21 @@ def init_db():
                         WHERE (feedback IS NULL OR feedback = '') AND notes != ''""")
     except Exception:
         pass
+    # One-time: fix UTF-8 mojibake in menu JSON (Latin-1 decoded as UTF-8)
+    try:
+        cur = conn.execute("SELECT restaurant, menu_json FROM menus")
+        rows = cur.fetchall() if hasattr(cur, 'fetchall') else []
+        for row in rows:
+            name = row[0] if isinstance(row, (list, tuple)) else row['restaurant']
+            json_str = row[1] if isinstance(row, (list, tuple)) else row['menu_json']
+            if json_str and '\xc3' in json_str:
+                fixed = json_str.encode('latin-1').decode('utf-8', errors='replace')
+                if fixed != json_str:
+                    conn.execute(
+                        "UPDATE menus SET menu_json = ? WHERE restaurant = ?",
+                        (fixed, name))
+    except Exception:
+        pass
     _commit(conn)
 
 
