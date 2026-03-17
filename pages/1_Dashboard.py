@@ -757,6 +757,43 @@ def _render_menu_preview(rm):
         components.html(html(t), height=ht(t), scrolling=False)
 
 
+def _render_column_sections(slug, ti, ci, cd):
+    """Render all sections for a single column inside its st.column."""
+    for si, sd in enumerate(cd['sections']):
+        st.markdown(f"**{sd['title'] or f'Section {si+1}'}**")
+        sd['title'] = st.text_input("Title", value=sd['title'],
+                                    key=f"et_{slug}_{ti}_{ci}_{si}_t")
+        sd['note'] = st.text_input("Note", value=sd.get('note') or '',
+                                   key=f"et_{slug}_{ti}_{ci}_{si}_n") or None
+        rm = []
+        for ii, it in enumerate(sd['items']):
+            ic1, ic2, ic3, ic4 = st.columns([3, 1.5, 3, 0.5])
+            with ic1:
+                it['name'] = st.text_input("N", value=it['name'],
+                    key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_n",
+                    label_visibility="collapsed", placeholder="Name")
+            with ic2:
+                it['price'] = st.text_input("P", value=it.get('price') or '',
+                    key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_p",
+                    label_visibility="collapsed", placeholder="Price") or None
+            with ic3:
+                it['description'] = st.text_input("D", value=it.get('description') or '',
+                    key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_d",
+                    label_visibility="collapsed", placeholder="Desc") or None
+            with ic4:
+                if st.button("X", key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_x",
+                             type="secondary"):
+                    rm.append(ii)
+        for ri in sorted(rm, reverse=True):
+            sd['items'].pop(ri)
+            st.rerun()
+        if st.button("+ Item", key=f"et_{slug}_{ti}_{ci}_{si}_a", type="secondary"):
+            sd['items'].append({'name': '', 'price': None, 'description': None,
+                                'raw': False, 'supplement': None, 'tags': []})
+            st.rerun()
+        st.markdown("---")
+
+
 def _render_menu_edit(slug, restaurant_model):
     from src.models import Restaurant as RestModel
     ek = f"ed_{slug}"
@@ -768,40 +805,18 @@ def _render_menu_edit(slug, restaurant_model):
             td['label'] = st.text_input("Tab", value=td['label'], key=f"et_{slug}_{ti}_l")
             td['description'] = st.text_area("Desc", value=td.get('description') or '',
                                              key=f"et_{slug}_{ti}_d", height=68) or None
-            for ci, cd in enumerate(td['columns']):
-                for si, sd in enumerate(cd['sections']):
-                    st.markdown("---")
-                    st.markdown(f"**Col {ci+1} — Sec {si+1}**")
-                    sd['title'] = st.text_input("Title", value=sd['title'],
-                                                key=f"et_{slug}_{ti}_{ci}_{si}_t")
-                    sd['note'] = st.text_input("Note", value=sd.get('note') or '',
-                                               key=f"et_{slug}_{ti}_{ci}_{si}_n") or None
-                    rm = []
-                    for ii, it in enumerate(sd['items']):
-                        cols = st.columns([3, 2, 3, 1])
-                        with cols[0]:
-                            it['name'] = st.text_input("N", value=it['name'],
-                                key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_n",
-                                label_visibility="collapsed", placeholder="Name")
-                        with cols[1]:
-                            it['price'] = st.text_input("P", value=it.get('price') or '',
-                                key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_p",
-                                label_visibility="collapsed", placeholder="Price") or None
-                        with cols[2]:
-                            it['description'] = st.text_input("D", value=it.get('description') or '',
-                                key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_d",
-                                label_visibility="collapsed", placeholder="Desc") or None
-                        with cols[3]:
-                            if st.button("X", key=f"et_{slug}_{ti}_{ci}_{si}_{ii}_x",
-                                         type="secondary"):
-                                rm.append(ii)
-                    for ri in sorted(rm, reverse=True):
-                        sd['items'].pop(ri)
-                        st.rerun()
-                    if st.button("+ Item", key=f"et_{slug}_{ti}_{ci}_{si}_a", type="secondary"):
-                        sd['items'].append({'name': '', 'price': None, 'description': None,
-                                            'raw': False, 'supplement': None, 'tags': []})
-                        st.rerun()
+            num_cols = len(td['columns'])
+            if num_cols > 1:
+                # Render columns side by side
+                st_cols = st.columns(num_cols)
+                for ci, cd in enumerate(td['columns']):
+                    with st_cols[ci]:
+                        st.markdown(f"##### Column {ci+1}")
+                        _render_column_sections(slug, ti, ci, cd)
+            else:
+                # Single column — render full width
+                for ci, cd in enumerate(td['columns']):
+                    _render_column_sections(slug, ti, ci, cd)
     cs, cc, _sp = st.columns([1, 1, 8])
     with cs:
         if st.button("Save", key=f"es_{slug}", type="primary"):
