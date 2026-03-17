@@ -80,7 +80,13 @@ _last_sync_status = ""
 def _commit(conn):
     """Commit and, for Turso connections, sync."""
     global _last_sync_status
-    conn.commit()
+    try:
+        conn.commit()
+    except (ValueError, Exception) as e:
+        # Connection may be stale — reconnect and retry
+        _local.conn = None
+        conn = get_connection()
+        conn.commit()
     if _use_turso():
         if hasattr(conn, 'sync'):
             try:
