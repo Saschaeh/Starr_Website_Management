@@ -1158,12 +1158,12 @@ def _render_copy_tab(slug, r_data, dname):
     _cg_warn = st.session_state.pop('_copy_gen_warning', '')
     if _cg_warn:
         st.warning(_cg_warn)
-    _dbg_resp = st.session_state.get('_debug_copy_response', '')
-    if _dbg_resp:
-        with st.expander("Debug: Last API Response", expanded=False):
-            st.text(f"Stop reason: {st.session_state.get('_debug_copy_stop', '?')}")
-            st.text(f"Output tokens: {st.session_state.get('_debug_copy_tokens', '?')}")
-            st.code(_dbg_resp, language=None)
+    _dbg = st.session_state.get('_debug_copy')
+    if _dbg:
+        if _dbg.get('status') == 'error':
+            st.error(f"Copy generation failed: {_dbg.get('error', 'unknown')}")
+        with st.expander("Debug: Last Copy Generation Result", expanded=True):
+            st.json(_dbg)
 
     # === Website Copy ===
     st.subheader("Website Copy")
