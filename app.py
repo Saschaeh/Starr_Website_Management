@@ -23,6 +23,24 @@ try:
 except Exception:
     pass
 
+# --- Password gate ---
+def _check_password():
+    if st.session_state.get("authenticated"):
+        return True
+    with st.container():
+        st.markdown("### :lock: Starr Content Hub")
+        pwd = st.text_input("Password", type="password", key="login_pwd")
+        if st.button("Log in"):
+            if pwd == st.secrets["auth"]["password"]:
+                st.session_state["authenticated"] = True
+                st.rerun()
+            else:
+                st.error("Incorrect password.")
+    return False
+
+if not _check_password():
+    st.stop()
+
 from src.db import init_db
 from src.ui.theme import inject_css, render_header
 
