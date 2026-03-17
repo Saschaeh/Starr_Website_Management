@@ -37,15 +37,48 @@ def _check_password():
     if not expected:
         st.error("No app password configured. Add [auth] password to Streamlit secrets or set APP_PASSWORD env var.")
         return False
-    with st.container():
-        st.markdown("### :lock: Starr Content Hub")
-        pwd = st.text_input("Password", type="password", key="login_pwd")
-        if st.button("Log in"):
-            if pwd == expected:
-                st.session_state["authenticated"] = True
-                st.rerun()
-            else:
-                st.error("Incorrect password.")
+    st.markdown("""
+    <style>
+    @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap');
+    #MainMenu {visibility: hidden;}
+    footer {visibility: hidden;}
+    [data-testid="stSidebar"] {display: none;}
+    .block-container {
+        max-width: 420px !important;
+        padding-top: 12vh !important;
+    }
+    .login-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    .login-header h1 {
+        font-family: 'Playfair Display', Georgia, serif;
+        color: #031E41;
+        font-size: 1.75rem;
+        margin: 0;
+    }
+    .login-header .subtitle {
+        font-family: 'DM Sans', sans-serif;
+        color: #C5A258;
+        font-size: 0.8rem;
+        font-weight: 500;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        margin-top: 0.35rem;
+    }
+    </style>
+    <div class="login-header">
+        <h1>Starr Restaurants</h1>
+        <div class="subtitle">Content Hub</div>
+    </div>
+    """, unsafe_allow_html=True)
+    pwd = st.text_input("Password", type="password", key="login_pwd")
+    if st.button("Log in", use_container_width=True, type="primary"):
+        if pwd == expected:
+            st.session_state["authenticated"] = True
+            st.rerun()
+        else:
+            st.error("Incorrect password.")
     return False
 
 if not _check_password():
