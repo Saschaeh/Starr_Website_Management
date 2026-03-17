@@ -885,7 +885,6 @@ REQUIRED_FIELDS = {f[0] for f in IMAGE_FIELDS if not f[5]}
 
 def _render_images_tab(slug, dname):
     st.subheader("Images")
-    st.caption("v5 — ADA uses Anthropic")
     from src.cms.image_processor import (
         resize_and_crop, fix_exif_orientation, make_image_filename,
         is_black_and_white, apply_black_overlay)
@@ -979,6 +978,8 @@ def _render_images_tab(slug, dname):
                 with st.spinner("Generating alt text..."):
                     at = generate_alt_text(pil) or ''
                 db.save_image(slug, fn, buf.getvalue(), up.name, at)
+                if at:
+                    st.session_state[f"ia_{slug}_{fn}"] = at
                 st.session_state[upload_done_key] = file_id
                 st.success(f"Saved {header.split('(')[0].strip()}!")
                 st.rerun()
@@ -1041,13 +1042,10 @@ def _render_images_tab(slug, dname):
                             g = generate_alt_text(Image.open(io.BytesIO(idata)))
                         if g:
                             db.update_alt_text(slug, fn, g)
-                            st.session_state[f'_ada_result_{fn}'] = f"Saved: {g[:80]}"
+                            st.session_state[alt_key] = g
                             st.rerun()
                         else:
                             st.error("Alt text generation failed. Check that ANTHROPIC_API_KEY is set in Streamlit secrets.")
-                    _ada_msg = st.session_state.pop(f'_ada_result_{fn}', '')
-                    if _ada_msg:
-                        st.success(_ada_msg)
                 with bc3:
                     if st.button("Remove Image", key=f"imgbtn_del_{slug}_{fn}"):
                         db.delete_image(slug, fn)
