@@ -548,9 +548,23 @@ def inject_css():
         background: transparent !important;
     }
 
-    /* Widen the main content area */
-    .block-container {
+    /* Widen the main content area — override all Streamlit width constraints */
+    .block-container,
+    [data-testid="stAppViewBlockContainer"],
+    .appview-container .main .block-container,
+    .stApp > header + div > div > div > div > div {
         max-width: 100% !important;
+        width: 100% !important;
+        padding-left: 2rem !important;
+        padding-right: 2rem !important;
+    }
+    .main .block-container {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    /* Remove any inner width restrictions on expanders and columns */
+    [data-testid="stExpander"] {
+        width: 100% !important;
     }
     </style>
     """, unsafe_allow_html=True)
