@@ -123,7 +123,7 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
             f"[META_DESCRIPTION]\nyour text\n[/META_DESCRIPTION]\n\n"
             f"IMPORTANT: You MUST stay within the word limits for each section."
         )
-        max_tokens = 1500
+        max_tokens = 2500
 
     try:
         client = anthropic.Anthropic(api_key=api_key)
@@ -154,7 +154,9 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
         'meta_description': 'META_DESCRIPTION',
     }
     for key, tag in tag_map.items():
-        pattern = rf'\[{tag}\](.*?)\[/{tag}\]'
+        # Allow spaces, underscores, or hyphens between words in tags
+        flexible_tag = tag.replace('_', r'[\s_-]?')
+        pattern = rf'\[{flexible_tag}\](.*?)\[/{flexible_tag}\]'
         match = re.search(pattern, response_text, re.DOTALL | re.IGNORECASE)
         copy_dict[key] = match.group(1).strip() if match else ""
 
