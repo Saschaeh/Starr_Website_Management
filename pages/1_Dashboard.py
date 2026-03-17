@@ -1144,11 +1144,19 @@ def _render_copy_tab(slug, r_data, dname):
                 with st.spinner("Generating copy..."):
                     success, cd, err = generate_copy(text, dname, instructions=instr)
                 if success:
+                    populated = []
+                    empty = []
                     for sid, content in cd.items():
                         if content:
                             st.session_state[f"{slug}_copy_{sid}"] = content
                             st.session_state[f"_w_{slug}_copy_{sid}"] = content
-                    st.success("Generated!")
+                            populated.append(sid)
+                        else:
+                            empty.append(sid)
+                    if populated:
+                        st.success("Generated!")
+                    if empty:
+                        st.warning(f"Could not generate: {', '.join(empty)}. Try 'Regen' for those sections.")
                     st.rerun()
                 else:
                     st.error(err)
@@ -1173,6 +1181,8 @@ def _render_copy_tab(slug, r_data, dname):
                                 st.rerun()
                             elif err:
                                 st.error(err)
+                            else:
+                                st.warning(f"Generation returned empty for {label}. Check terminal for debug output.")
                         else:
                             st.error(error)
 
@@ -1199,6 +1209,8 @@ def _render_copy_tab(slug, r_data, dname):
                                 st.rerun()
                             elif err:
                                 st.error(err)
+                            else:
+                                st.warning(f"Generation returned empty for {label}. Check terminal for debug output.")
                         else:
                             st.error(error)
 

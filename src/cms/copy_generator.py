@@ -133,6 +133,9 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
             messages=[{"role": "user", "content": prompt}],
         )
         response_text = result.content[0].text.strip()
+        print(f"[CopyGen] stop_reason={result.stop_reason} "
+              f"tokens={result.usage.output_tokens} section={section}")
+        print(f"[CopyGen] response preview: {response_text[:500]}")
     except anthropic.AuthenticationError:
         return False, {}, "Invalid Anthropic API key."
     except anthropic.RateLimitError:
@@ -143,6 +146,8 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
         return False, {}, f"Copy generation failed: {e}"
 
     if section:
+        if not response_text:
+            return False, {}, f"API returned empty response for {section}."
         return True, {section: response_text}, ""
 
     copy_dict = {}
@@ -159,6 +164,11 @@ def generate_copy(website_text, restaurant_name, section=None, instructions=None
         pattern = rf'\[{flexible_tag}\](.*?)\[/{flexible_tag}\]'
         match = re.search(pattern, response_text, re.DOTALL | re.IGNORECASE)
         copy_dict[key] = match.group(1).strip() if match else ""
+
+    missing = [k for k, v in copy_dict.items() if not v]
+    if missing:
+        print(f"[CopyGen] WARNING: empty sections: {missing}")
+        print(f"[CopyGen] full response:\n{response_text}")
 
     if not any(copy_dict.values()):
         return False, {}, "Could not parse generated copy. Please try again."
