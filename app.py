@@ -24,14 +24,24 @@ except Exception:
     pass
 
 # --- Password gate ---
+def _get_app_password():
+    try:
+        return st.secrets["auth"]["password"]
+    except (KeyError, FileNotFoundError):
+        return os.environ.get("APP_PASSWORD")
+
 def _check_password():
     if st.session_state.get("authenticated"):
         return True
+    expected = _get_app_password()
+    if not expected:
+        st.error("No app password configured. Add [auth] password to Streamlit secrets or set APP_PASSWORD env var.")
+        return False
     with st.container():
         st.markdown("### :lock: Starr Content Hub")
         pwd = st.text_input("Password", type="password", key="login_pwd")
         if st.button("Log in"):
-            if pwd == st.secrets["auth"]["password"]:
+            if pwd == expected:
                 st.session_state["authenticated"] = True
                 st.rerun()
             else:
