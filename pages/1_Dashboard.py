@@ -1075,6 +1075,7 @@ def _render_images_tab(slug, dname):
 
 def _render_copy_tab(slug, r_data, dname):
     st.subheader("Copy")
+    st.caption("🔧 Debug mode active — v3")
     from src.cms.copy_generator import (
         COPY_SECTIONS, generate_copy, load_master_instructions,
         save_master_instructions, DEFAULT_COPY_INSTRUCTIONS)
