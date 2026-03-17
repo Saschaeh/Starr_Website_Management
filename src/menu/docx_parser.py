@@ -133,7 +133,24 @@ def extract_text(file_bytes: bytes) -> str:
             lines.append(f"# {text}")
             continue
         if heading == 2:
-            lines.append(f"## {text}")
+            # If heading contains a price (e.g. "ADD OSCAR $210"),
+            # split into section title + item line.
+            # para.text may include multiple lines, so check the first line.
+            head_lines = text.split("\n")
+            first_line = head_lines[0].rstrip()
+            price_match = re.search(r'\s+(\$\d[\d,]*(?:\.\d{2})?|\bMP\b)\s*$', first_line)
+            if price_match:
+                title = first_line[:price_match.start()].strip()
+                price = price_match.group(1)
+                desc = " ".join(l.strip() for l in head_lines[1:] if l.strip())
+                lines.append(f"## {title}")
+                item_parts = [title]
+                if desc:
+                    item_parts.append(desc)
+                item_parts.append(price)
+                lines.append("  ".join(item_parts))
+            else:
+                lines.append(f"## {text}")
             continue
 
         if _is_list_paragraph(para) and not in_menu_section:
