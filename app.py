@@ -2,6 +2,14 @@
 
 import os
 import streamlit as st
+
+# Page config MUST be the first Streamlit command
+st.set_page_config(
+    page_title="Starr Content Hub",
+    page_icon=":fork_and_knife:",
+    layout="wide",
+)
+
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -20,18 +28,6 @@ from src.ui.theme import inject_css, render_header
 
 # Initialize database on first run
 init_db()
-
-# Store HF token in session state for downstream use
-hf_token = os.getenv('HF_API_TOKEN', '')
-if hf_token and 'hf_api_token' not in st.session_state:
-    st.session_state['hf_api_token'] = hf_token
-
-# --- Page Config ---
-st.set_page_config(
-    page_title="Starr Content Hub",
-    page_icon=":fork_and_knife:",
-    layout="wide",
-)
 
 # --- Inject master CSS ---
 inject_css()

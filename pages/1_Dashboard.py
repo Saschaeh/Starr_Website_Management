@@ -885,6 +885,7 @@ REQUIRED_FIELDS = {f[0] for f in IMAGE_FIELDS if not f[5]}
 
 def _render_images_tab(slug, dname):
     st.subheader("Images")
+    st.caption("v5 — ADA uses Anthropic")
     from src.cms.image_processor import (
         resize_and_crop, fix_exif_orientation, make_image_filename,
         is_black_and_white, apply_black_overlay)
