@@ -37,31 +37,15 @@ def inject_css():
     footer {visibility: hidden;}
     img { border-radius: 0 !important; }
 
-    /* === FULL-WIDTH LAYOUT — override ALL Streamlit width constraints === */
+    /* === FULL-WIDTH LAYOUT === */
     .block-container,
-    [data-testid="stMainBlockContainer"],
-    [data-testid="stAppViewBlockContainer"],
-    [data-testid="stMain"] > div,
-    .main .block-container,
-    .appview-container .main .block-container,
-    section[data-testid="stMain"] .block-container,
-    [data-testid="stMainBlockContainer"][style],
-    div[class*="st-emotion-cache"][data-testid="stMainBlockContainer"] {
+    [data-testid="stMainBlockContainer"] {
         max-width: 100% !important;
         width: 100% !important;
         padding-top: 4rem !important;
         padding-bottom: 2rem !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-    }
-    /* Nuclear: override any element under stMain that has a max-width set */
-    section[data-testid="stMain"] > div {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
-    section[data-testid="stMain"] > div > div {
-        max-width: 100% !important;
-        width: 100% !important;
     }
 
     /* Give form elements white backgrounds */
@@ -572,3 +556,25 @@ def inject_css():
     }
     </style>
     """, unsafe_allow_html=True)
+
+    # JS enforcer: sets inline max-width after Streamlit's emotion CSS loads.
+    # Uses st.components.v1.html so the <script> actually executes.
+    # MutationObserver re-applies on every Streamlit rerun.
+    import streamlit.components.v1 as components
+    components.html("""
+    <script>
+    function enforceWide() {
+        const root = window.parent.document;
+        const el = root.querySelector('[data-testid="stMainBlockContainer"]');
+        if (el) { el.style.setProperty('max-width', '100%', 'important');
+                   el.style.setProperty('width', '100%', 'important'); }
+        root.querySelectorAll('.block-container').forEach(function(e) {
+            e.style.setProperty('max-width', '100%', 'important');
+            e.style.setProperty('width', '100%', 'important');
+        });
+    }
+    enforceWide();
+    const obs = new MutationObserver(enforceWide);
+    obs.observe(window.parent.document.body, {childList:true, subtree:true, attributes:true, attributeFilter:['class','style']});
+    </script>
+    """, height=0)
