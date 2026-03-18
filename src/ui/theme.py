@@ -35,16 +35,28 @@ def inject_css():
     [data-testid="stDecoration"] { display: none !important; }
     #MainMenu {visibility: hidden;}
     footer {visibility: hidden;}
+    img { border-radius: 0 !important; }
 
-    .block-container {
+    /* === FULL-WIDTH LAYOUT — override ALL Streamlit width constraints === */
+    .block-container,
+    [data-testid="stMainBlockContainer"],
+    [data-testid="stAppViewBlockContainer"],
+    [data-testid="stMain"] > div,
+    .main .block-container,
+    .appview-container .main .block-container,
+    section[data-testid="stMain"] .block-container {
+        max-width: 100% !important;
+        width: 100% !important;
         padding-top: 4rem !important;
         padding-bottom: 2rem !important;
         padding-left: 2rem !important;
         padding-right: 2rem !important;
-        max-width: 100% !important;
     }
-
-    img { border-radius: 0 !important; }
+    /* Kill any inline max-width Streamlit injects via style attribute */
+    [data-testid="stMainBlockContainer"][style] {
+        max-width: 100% !important;
+        width: 100% !important;
+    }
 
     /* Give form elements white backgrounds */
     [data-testid="stTextInput"] input,
@@ -548,20 +560,6 @@ def inject_css():
         background: transparent !important;
     }
 
-    /* Widen the main content area — override all Streamlit width constraints */
-    .block-container,
-    [data-testid="stAppViewBlockContainer"],
-    .appview-container .main .block-container,
-    .stApp > header + div > div > div > div > div {
-        max-width: 100% !important;
-        width: 100% !important;
-        padding-left: 2rem !important;
-        padding-right: 2rem !important;
-    }
-    .main .block-container {
-        max-width: 100% !important;
-        width: 100% !important;
-    }
     /* Remove any inner width restrictions on expanders and columns */
     [data-testid="stExpander"] {
         width: 100% !important;
