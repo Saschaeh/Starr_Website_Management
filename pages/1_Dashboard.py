@@ -475,7 +475,13 @@ def _show_detail_view(slug):
     with tab_ov:
         _render_overview(slug, r_data, dname)
     with tab_mn:
-        _render_menu_tab(slug, dname, menus_list)
+        st.subheader("Menu")
+        st.info("The menu editor has moved to a dedicated app.")
+        st.link_button(
+            "Open Menu Editor",
+            "https://stg-starrwebsite-staging.kinsta.cloud/menu-editor",
+            type="primary",
+        )
     with tab_im:
         _render_images_tab(slug, dname)
     with tab_cp:
