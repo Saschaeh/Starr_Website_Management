@@ -483,13 +483,37 @@ def _show_detail_view(slug):
             type="primary",
         )
     with tab_im:
-        _render_images_tab(slug, dname)
+        st.subheader("Images")
+        st.info("Image management has moved to the new hub.")
+        st.link_button(
+            "Open Image & Copy Manager",
+            "https://stg-starrwebsite-staging.kinsta.cloud/img-copy-manager",
+            type="primary",
+        )
     with tab_cp:
-        _render_copy_tab(slug, r_data, dname)
+        st.subheader("Copy")
+        st.info("Copy management has moved to the new hub.")
+        st.link_button(
+            "Open Image & Copy Manager",
+            "https://stg-starrwebsite-staging.kinsta.cloud/img-copy-manager",
+            type="primary",
+        )
     with tab_br:
-        _render_brand_tab(slug, r_data, dname)
+        st.subheader("Brand")
+        st.info("Brand management has moved to the new hub.")
+        st.link_button(
+            "Open Image & Copy Manager",
+            "https://stg-starrwebsite-staging.kinsta.cloud/img-copy-manager",
+            type="primary",
+        )
     with tab_res:
-        _render_reservations_tab(slug, r_data, dname)
+        st.subheader("IDs")
+        st.info("ID management has moved to the new hub.")
+        st.link_button(
+            "Open Image & Copy Manager",
+            "https://stg-starrwebsite-staging.kinsta.cloud/img-copy-manager",
+            type="primary",
+        )
     with tab_lnk:
         _render_links_tab(slug, r_data, dname)
     with tab_loc:
