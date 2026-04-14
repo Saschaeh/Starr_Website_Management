@@ -1002,6 +1002,13 @@ def _render_images_tab(slug, dname):
                     else:
                         st.image(idata, width=300)
 
+            # Chef B&W toggle (default on) — shown above uploader
+            bw_on = True
+            if is_chef:
+                bw_on = st.toggle(
+                    "Convert to Black & White on upload",
+                    value=True, key=f"ibw_{slug}_{fn}")
+
             # File uploader
             up = st.file_uploader(
                 "Upload image", type=['jpg', 'jpeg', 'png', 'webp'],
@@ -1014,7 +1021,7 @@ def _render_images_tab(slug, dname):
                 pil = fix_exif_orientation(Image.open(up))
                 if pil.mode in ('RGBA', 'LA', 'PA', 'P'):
                     pil = pil.convert('RGB')
-                if is_chef:
+                if is_chef and bw_on:
                     pil = pil.convert('L').convert('RGB')
                 pil = resize_and_crop(pil, tw, th)
                 buf = io.BytesIO()
